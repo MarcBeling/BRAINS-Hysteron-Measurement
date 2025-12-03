@@ -192,6 +192,18 @@ class NIDAQ_channel():
     Represents the activation and readout channel for a singular channel id.
     The NIDAQ has two modules, an activation and readout module.
     Both have the same amount of channels (16x), which can be used to drive a voltage or measure current.
+    Attributes:
+        setupManager (SetupManager): The setup manager of the current experiment.
+        id (int): The channel id. Can take values from 0 to 15.
+        activation_module (str): The string identifying the activation module address. Usually `cDAQ1Mod1`.
+        readout_module (str): The string identifying the readout module address. Usually `cDAQ1Mod2`.
+        sample_frequency (float): The rate at which the channel is taking measurements. Not useful when making distinct measurements with no averaging.
+        update_frequqncy (float): The rate at which the channel is updating the voltage applied. Not useful when making continous activation.
+        averaging (int): How many points should the channel average over to output a single value.
+        min_voltage (float): Minimum voltage that should be driven at a channel.
+        max_voltage (float): Maximum voltage that should be driven at a channel.
+        current_amplification (float): By how much the current readout must be divided by to get accurate measurements.
+        thread (Thread): Sometimes the NIDAQ channel must run in a seperate measurement thread to the main one, which will be handle through this attribute.
     """
 
     def __init__(self,
