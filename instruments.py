@@ -203,7 +203,6 @@ class NIDAQ_channel():
         min_voltage (float): Minimum voltage that should be driven at a channel.
         max_voltage (float): Maximum voltage that should be driven at a channel.
         current_amplification (float): By how much the current readout must be divided by to get accurate measurements.
-        thread (Thread): Sometimes the NIDAQ channel must run in a seperate measurement thread to the main one, which will be handle through this attribute.
     """
 
     def __init__(self,
@@ -221,11 +220,9 @@ class NIDAQ_channel():
         self.min_voltage = self.setupManager.get_voltage_range()[0]
         self.max_voltage = self.setupManager.get_voltage_range()[1]
         self.current_amplification = self.setupManager.get_setup_config()['amplification']
-        self.THREAD_STOP_EVENT = threading.Event()
-        self.thread = threading.Thread(target=self._thread_function)
         self.voltage = 0
 
-    def measure_voltage_single(self) -> float:
+    def measure_voltage(self) -> float:
         with nidaqmx.Task() as task:
             task.ai_channels.add_ai_voltage_chan(f"{self.readout_module}/ai{self.id}")
             task.timing.cfg_samp_clk_timing(rate=self.sample_frequency,
@@ -237,7 +234,7 @@ class NIDAQ_channel():
         else:
             raise NoMeasurementError(f"(NIDAQ {self.readout_module}/ai{self.id})")
 
-    def measure_current_single(self) -> float:
+    def measure_current(self) -> float:
         with nidaqmx.Task() as task:
             task.ai_channels.add_ai_current_chan(f"{self.readout_module}/ai{self.id}")
             task.timing.cfg_samp_clk_timing(rate=self.sample_frequency,
@@ -249,85 +246,32 @@ class NIDAQ_channel():
         else:
             raise NoMeasurementError(f"(NIDAQ {self.readout_module}/ai{self.id})")
 
-    # TODO: Fix measuring and applying voltage simultanously and reading voltage and current simultanously
 
-    def start_thread(self, target_voltage: float):
-        if self.thread.is_alive():
-            self.setupManager.log_warning(f"(NIDAQ Channel {self.id}) The device is continously setting a voltage already, please stop the measuring thread beforehand.")
-        else:
-            self.THREAD_STOP_EVENT.clear()
+    def ramp_to_voltage(self, target_voltage: float):
+        voltages = np.linspace(start=self.voltage,
+                            stop=target_voltage,
+                            num=self.setupManager.get_setup_config()['ramp_points']) 
+        try:
+            with nidaqmx.Task() as task:
+                task.ao_channels.add_ao_voltage_chan(
+                    f"{self.activation_module}/ao{self.id}",
+                    min_val=self.min_voltage,
+                    max_val=self.max_voltage,
+                    units=VoltageUnits.VOLTS
+                )
+                task.timing.cfg_samp_clk_timing(rate=self.sample_frequency,
+                                sample_mode=AcquisitionType.FINITE,
+                                samps_per_chan=self.averaging)
+                task.write(voltages, auto_start=False) # type: ignore
             self.voltage = target_voltage
-            self.thread.start()
-            self.setupManager.log_info(f"(NIDAQ Channel {self.id}) Continous voltage of {self.voltage}V is now active.")
-
-    def _thread_function(self):
-        start_voltage = self.measure_voltage_single()
-        voltages = np.linspace(start=start_voltage,
-                        stop=self.voltage,
-                        num=self.setupManager.get_setup_config()['ramp_points']) 
-        with nidaqmx.Task() as task:
-            task.ao_channels.add_ao_voltage_chan(f"{self.activation_module}/ao{self.id}",
-                                                 min_val=self.min_voltage,
-                                                 max_val=self.max_voltage,
-                                                 units=VoltageUnits.VOLTS)
-            task.ai_channels.add_ai_voltage_chan(f"{self.readout_module}/ai{self.id}")
-            task.ai_channels.add_ai_current_chan(f"{self.readout_module}/ai{self.id}")
-            task.timing.cfg_samp_clk_timing(rate=self.sample_frequency,
-                                            sample_mode=AcquisitionType.CONTINUOUS,
-                                            samps_per_chan=self.averaging)
-            
-            task.write(voltages)
-            while not self.THREAD_STOP_EVENT.is_set():
-                self.measured_voltage = task.read(number_of_samples_per_channel=self.averaging)
-                task.write(self.voltage)
-                time.sleep(self.update_period)  # Update every 100 ms (adjust as needed)
-            # Apply end behavior
-            task.write(np.flip(voltages))
- 
-    def stop_thread(self):
-        self.THREAD_STOP_EVENT.set()
-        self.thread.join()
-        self.voltage = 0
-        self.setupManager.log_info(f"(NIDAQ Channel {self.activation_module}/ao{self.id}) Continous voltage has been stopped.")
-    
-
-    def correct_voltage(self, target_voltage: float):
-        if self.thread.is_alive():
-            self.setupManager.log_warning(f"(NIDAQ Channel {self.activation_module}/ao{self.id}) The device is continously setting a voltage already, please stop the thread before calling this function.")
-        else:
-            start_voltage = self.measure_voltage()
-            self.ramp_to_voltage(start_voltage, target_voltage)
-
-    def ramp_to_voltage(self, start_voltage: float, target_voltage: float):
-            if not self.thread.is_alive():
-                voltages = np.linspace(start=start_voltage,
-                                    stop=target_voltage,
-                                    num=self.setupManager.get_setup_config()['ramp_points']) 
-                try:
-                    with nidaqmx.Task() as task:
-                        task.ao_channels.add_ao_voltage_chan(
-                            f"{self.activation_module}/ao{self.id}",
-                            min_val=self.min_voltage,
-                            max_val=self.max_voltage,
-                            units=VoltageUnits.VOLTS
-                        )
-                        task.timing.cfg_samp_clk_timing(rate=self.sample_frequency,
-                                        sample_mode=AcquisitionType.FINITE,
-                                        samps_per_chan=self.averaging)
-                        task.write(voltages, auto_start=False) # type: ignore
-                except DaqError as e:
-                    self.setupManager.log_error(f"(NIDAQ Channel {self.activation_module}/ao{self.id}) Failed to set voltage: {e}")
-            else:
-                self.setupManager.log_warning(f"(NIDAQ Channel {self.activation_module}/ao{self.id}) The device is continously setting a voltage already, please stop the measuring thread beforehand.")
-
-
+        except DaqError as e:
+            self.setupManager.log_error(f"(NIDAQ Channel {self.activation_module}/ao{self.id}) Failed to set voltage: {e}")
+          
     def __str__(self) -> str:
         return str(self.id)
 
-
     def shutdown(self):
-        if self.thread.is_alive():
-            self.stop_thread()
+        self.ramp_to_voltage(0)
         self.setupManager.log_info(f"(NIDAQ Channel {self.id}) shutdown.")
 
 
