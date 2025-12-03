@@ -1,0 +1,57 @@
+from setupmanager import SetupManager
+from instruments import SMU, NIDAQ_chassis
+import numpy as np
+from typing import List, Dict
+from abc import ABC, abstractmethod
+
+class Experiment(ABC):
+    """
+    Abstract class to unifying Experiment implementation.
+    Requires an implementation of a setup manager, and a run function.
+    """
+    def __init__(self) -> None:
+        super().__init__()
+
+    @property
+    @abstractmethod
+    def setupManager(self) -> SetupManager:
+        pass
+
+    @abstractmethod
+    def run(self) -> None:
+        pass
+
+class RNPU_Experiment(Experiment):
+    """
+    RNPU_Experiment handles the execution of experiments using SMU and NIDAQ equipment.
+    This class orchestrates the measurement workflow by:
+    1. Initializing hardware interfaces (SMU and NIDAQ)
+    2. Sweeping through input currents via SMU
+    3. Measuring voltages and currents across all active NIDAQ channels
+    4. Recording and writing results to the setup manager
+    5. Properly shutting down all equipment
+    Attributes:
+        setupManager (SetupManager): Manages experiment configuration and data I/O
+        smu (SMU): Source Measurement Unit interface for setting currents
+        nidaq (NIDAQ_chassis): National Instruments DAQ chassis for voltage/current measurements
+    """
+    def __init__(self, setupManager: SetupManager) -> None:
+        self.setupManager: SetupManager = setupManager
+        self.smu: SMU = SMU(setupManager)
+        self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
+        
+    def run(self):
+        self.nidaq.start_active_all_channels()
+        voltages: List[Dict[int, float]] = []
+        currents: List[Dict[int, float]] = []
+
+        for input_current in self.setupManager.get_input_data():
+            self.smu.set_current(input_current)
+            voltages.append(self.nidaq.measure_current_all_channels())
+            currents.append(self.nidaq.measure_voltage_all_channels())
+    
+        self.setupManager.write_voltage(voltages)
+        self.setupManager.write_current(currents)
+
+        self.smu.shutdown()
+        self.nidaq.shutdown()
