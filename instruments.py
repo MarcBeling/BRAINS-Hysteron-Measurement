@@ -221,6 +221,50 @@ class NIDAQ_channel():
         self.max_voltage = self.setupManager.get_voltage_range()[1]
         self.current_amplification = self.setupManager.get_setup_config()['amplification']
         self.voltage = 0
+        self.thread_stop = threading.Event()
+        self.thread = None
+
+    def set_voltage(self, target_voltage: float, continous: bool):
+        if self.thread is not None and self.thread.is_alive():
+            self._stop_voltage_thread()
+            self.setupManager.log_warning(f"(NIDAQ {self.activation_module}/ao{self.id} had its activation thread stopped too early!")
+            self.thread = threading.Thread(target=self._set_voltage_thread_function, args=(target_voltage,), daemon=True)
+            self.thread.start()
+        else:
+            with nidaqmx.Task() as task:
+                task.ao_channels.add_ao_voltage_chan(
+                    f"{self.activation_module}/ao{self.id}",
+                    min_val=self.min_voltage,
+                    max_val=self.max_voltage,
+                    units=VoltageUnits.VOLTS
+                )
+                task.write(target_voltage, auto_start=True) # type: ignore
+
+    def _set_voltage_thread_function(self, target_voltage):
+        self.setupManager.log_info(f"(NIDAQ {self.activation_module}/ao{self.id}) Voltage activation thread started.")
+        voltages = np.linspace(start=self.voltage,
+                    stop=target_voltage,
+                    num=self.setupManager.get_setup_config()['ramp_points'])
+        voltages_down = np.linspace(start=target_voltage,
+                    stop=0,
+                    num=self.setupManager.get_setup_config()['ramp_points']) 
+        with nidaqmx.Task() as task:
+            task.ao_channels.add_ao_voltage_chan(
+                f"{self.activation_module}/ao{self.id}",
+                min_val=self.min_voltage,
+                max_val=self.max_voltage,
+                units=VoltageUnits.VOLTS
+            )
+            task.write(voltages, auto_start=True) # type: ignore
+            self.voltage = target_voltage
+            while not self.thread_stop.is_set():
+                task.write(target_voltage, auto_start=True) # type: ignore
+            task.write(voltages_down)
+            self.voltage = 0
+        self.setupManager.log_info(f"(NIDAQ {self.activation_module}/ao{self.id}) Voltage activation thread stopped.")
+
+    def _stop_voltage_thread(self):
+        self.thread_stop.set()
 
     def measure_voltage(self) -> float:
         with nidaqmx.Task() as task:
@@ -245,7 +289,6 @@ class NIDAQ_channel():
             return np.average(current) # type: ignore
         else:
             raise NoMeasurementError(f"(NIDAQ {self.readout_module}/ai{self.id})")
-
 
     def ramp_to_voltage(self, target_voltage: float):
         voltages = np.linspace(start=self.voltage,
