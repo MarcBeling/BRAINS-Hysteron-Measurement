@@ -12,4 +12,9 @@ if __name__=="__main__":
     try:
         experiment.run()
     except KeyboardInterrupt:
+        pass
+    finally:
         setupManager.log_warning("Program interrupted by user.")
+        experiment.shutdown()
+        
+

@@ -241,11 +241,10 @@ class NIDAQ_channel():
         """
 
         if continous:
-            if self.thread is not None and self.thread.is_alive():
-                self.stop_voltage_thread()
-                self.setupManager.log_warning(f"(NIDAQ {self.activation_module}/ao{self.id} had its activation thread stopped too early!")
-                self.thread = threading.Thread(target=self._set_voltage_thread_function, args=(target_voltage,), daemon=True)
-                self.thread.start()
+            self.stop_voltage_thread()
+            self.setupManager.log_warning(f"(NIDAQ {self.activation_module}/ao{self.id} had its activation thread stopped too early!")
+            self.thread = threading.Thread(target=self._set_voltage_thread_function, args=(target_voltage,), daemon=True)
+            self.thread.start()
         else:
             with nidaqmx.Task() as task:
                 task.ao_channels.add_ao_voltage_chan(
@@ -255,6 +254,7 @@ class NIDAQ_channel():
                     units=VoltageUnits.VOLTS
                 )
                 task.write(target_voltage, auto_start=True) # type: ignore
+                self.voltage = target_voltage 
 
     def _set_voltage_thread_function(self, target_voltage):
         """
@@ -341,10 +341,7 @@ class NIDAQ_channel():
                     max_val=self.max_voltage,
                     units=VoltageUnits.VOLTS
                 )
-                task.timing.cfg_samp_clk_timing(rate=self.sample_frequency,
-                                sample_mode=AcquisitionType.FINITE,
-                                samps_per_chan=self.averaging)
-                task.write(voltages, auto_start=False) # type: ignore
+                task.write(voltages, auto_start=True) # type: ignore
             self.voltage = target_voltage
         except DaqError as e:
             self.setupManager.log_error(f"(NIDAQ Channel {self.activation_module}/ao{self.id}) Failed to set voltage: {e}")
@@ -354,6 +351,7 @@ class NIDAQ_channel():
 
     def shutdown(self):
         self.ramp_to_voltage(0)
+        # self.set_voltage(0, continous=False)
         self.setupManager.log_info(f"(NIDAQ Channel {self.id}) shutdown.")
 
 
@@ -401,7 +399,7 @@ class NIDAQ_chassis():
                                                      self.readout_module.name)
         self.setupManager.log_info(f" --- INSTRUMENT: NIDAQ --- ") 
         self.setupManager.log_info(f'Following voltages will be applied: {",".join(map(str, self.activation_voltages.values()))} on channels {",".join(map(str, self.activation_channels.keys()))} respectively')
-        self.setupManager.wait_for_user_input()
+        # self.setupManager.wait_for_user_input()
         self._calibrate_to_zero_all()
 
 
@@ -413,6 +411,7 @@ class NIDAQ_chassis():
         :param self: Instance of NIDAQ_chassis
         """
         for channel, voltage in self.activation_voltages.items():
+                self.setupManager.log_info(f"(NIDAQ Channel {channel}) Voltage {voltage}V applied.")
                 self.activation_channels[channel].set_voltage(voltage, continous)
 
     def stop_any_activation_thread(self):

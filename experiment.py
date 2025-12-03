@@ -3,6 +3,7 @@ from instruments import SMU, NIDAQ_chassis
 import numpy as np
 from typing import List, Dict
 from abc import ABC, abstractmethod
+import atexit
 
 class Experiment(ABC):
     """
@@ -11,11 +12,6 @@ class Experiment(ABC):
     """
     def __init__(self) -> None:
         super().__init__()
-
-    @property
-    @abstractmethod
-    def setupManager(self) -> SetupManager:
-        pass
 
     @abstractmethod
     def run(self) -> None:
@@ -37,21 +33,26 @@ class RNPU_Experiment(Experiment):
     """
     def __init__(self, setupManager: SetupManager) -> None:
         self.setupManager: SetupManager = setupManager
-        self.smu: SMU = SMU(setupManager)
+        # self.smu: SMU = SMU(setupManager)
         self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
+        atexit.register(self.shutdown)
         
     def run(self):
-        self.nidaq.start_active_all_channels()
+        self.nidaq.start_active_all_channels(continous=False)
         voltages: List[Dict[int, float]] = []
         currents: List[Dict[int, float]] = []
-
+        i = 0
         for input_current in self.setupManager.get_input_data():
-            self.smu.set_current(input_current)
+            # self.smu.set_current(input_current)
             voltages.append(self.nidaq.measure_current_all_channels())
             currents.append(self.nidaq.measure_voltage_all_channels())
+            print(f"Loop {i}")
+            i = i + 1
     
         self.setupManager.write_voltage(voltages)
         self.setupManager.write_current(currents)
 
-        self.smu.shutdown()
+        self.shutdown()
+
+    def shutdown(self):
         self.nidaq.shutdown()
