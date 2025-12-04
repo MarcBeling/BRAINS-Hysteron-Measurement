@@ -4,6 +4,7 @@ import numpy as np
 from typing import List, Dict
 from abc import ABC, abstractmethod
 import atexit
+import time
 
 class Experiment(ABC):
     """
@@ -73,9 +74,10 @@ class NGR_Experiment(Experiment):
         currents = []
         input_data = self.setupManager.get_input_data()
         for index, input_voltage in enumerate(input_data):
-            self.nidaq.set_voltage(5, input_voltage, False)
-            currents.append(self.smu.measure_current())
+            self.smu.set_voltage(input_voltage)
+            currents.append(self.nidaq.measure_current(5))
             self.setupManager.log_info(f"Voltage @ {input_voltage}V, {index}/{len(input_data)}")
+            time.sleep(0.1)
         self.setupManager.write_current_numpy(np.asarray(currents))
 
     def shutdown(self):

@@ -15,7 +15,7 @@ nidaq:
   sample_frequency: 10000.0
   update_frequency: 1000.0
   samples_per_measurement: 5
-  readout_channels: [] # 0-7
+  readout_channels: [14] # 0-7
   control_voltages:
     5: 0
 

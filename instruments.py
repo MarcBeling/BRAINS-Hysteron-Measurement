@@ -38,8 +38,6 @@ class SMU():
         self.compliance_current: float = np.min(np.abs(self.setupManager.get_current_range()))  
         drive_mode = self.config['drive_mode'] 
         self.device = self._get_device()
-        self.device.ramp_to_current(0)
-        self.device.ramp_to_voltage(0)
         self.device.reset()
         self.device.clear()
         if drive_mode == 'CURRENT_DRIVEN':
@@ -192,8 +190,6 @@ class SMU():
         
         :param self: Instance of the SMU
         """
-        self.set_current(0)
-        self.set_voltage(0)
         self.device.shutdown()
         self.setupManager.log_info("SMU shutdown.")
 
@@ -371,11 +367,11 @@ class NIDAQ_chassis():
         else:
             self.activation_channels[id].set_voltage(target_voltage)
 
-    def measure_current(self, id: int):
-        self.readout_channels[id].measure_current()
+    def measure_current(self, id: int) -> float:
+        return self.readout_channels[id].measure_current()
 
-    def measure_voltage(self, id: int):
-        self.readout_channels[id].measure_voltage()
+    def measure_voltage(self, id: int) -> float:
+        return self.readout_channels[id].measure_voltage()
         
     def _calibrate_to_zero_all(self):
         """
