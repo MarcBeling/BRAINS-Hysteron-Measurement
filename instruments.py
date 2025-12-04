@@ -3,8 +3,6 @@ from typing import Dict, Union
 
 from errors import NoMeasurementError, \
 BadConfigError, DeviceNotFoundError
-import time
-import threading
 from setupmanager import SetupManager
 
 import nidaqmx
@@ -221,8 +219,6 @@ class NIDAQ_channel():
         self.max_voltage = self.setupManager.get_voltage_range()[1]
         self.current_amplification = self.setupManager.get_setup_config()['amplification']
         self.voltage = 0
-        self.thread_stop = threading.Event()
-        self.thread = None
 
     def set_voltage(self, target_voltage: float, continous: bool):
         """
@@ -239,44 +235,6 @@ class NIDAQ_channel():
             - The target_voltage must be within the min_voltage and max_voltage range of the channel.
             - The channel must be properly initialized before calling this method.
         """
-
-        if continous:
-            self.stop_voltage_thread()
-            self.setupManager.log_warning(f"(NIDAQ {self.activation_module}/ao{self.id} had its activation thread stopped too early!")
-            self.thread = threading.Thread(target=self._set_voltage_thread_function, args=(target_voltage,), daemon=True)
-            self.thread.start()
-        else:
-            with nidaqmx.Task() as task:
-                task.ao_channels.add_ao_voltage_chan(
-                    f"{self.activation_module}/ao{self.id}",
-                    min_val=self.min_voltage,
-                    max_val=self.max_voltage,
-                    units=VoltageUnits.VOLTS
-                )
-                task.write(target_voltage, auto_start=True) # type: ignore
-                self.voltage = target_voltage 
-
-    def _set_voltage_thread_function(self, target_voltage):
-        """
-        Thread function that manages voltage ramping for a DAQ analog output channel.
-        Ramps voltage from the current level to a target voltage over a specified number of points,
-        maintains the target voltage until a stop signal is received, then ramps down to 0V.
-        Args:
-            target_voltage (float): The target voltage to ramp to and maintain.
-        Notes:
-            - Logs the start and stop of the voltage activation thread.
-            - Uses the setup configuration to determine the number of ramp points.
-            - Runs in a separate thread controlled by self.thread_stop event.
-            - Voltage is ramped down to 0V before the thread terminates.
-            - Voltage values are constrained between min_voltage and max_voltage.
-        """
-        self.setupManager.log_info(f"(NIDAQ {self.activation_module}/ao{self.id}) Voltage activation thread started.")
-        voltages = np.linspace(start=self.voltage,
-                    stop=target_voltage,
-                    num=self.setupManager.get_setup_config()['ramp_points'])
-        voltages_down = np.linspace(start=target_voltage,
-                    stop=0,
-                    num=self.setupManager.get_setup_config()['ramp_points']) 
         with nidaqmx.Task() as task:
             task.ao_channels.add_ao_voltage_chan(
                 f"{self.activation_module}/ao{self.id}",
@@ -284,26 +242,8 @@ class NIDAQ_channel():
                 max_val=self.max_voltage,
                 units=VoltageUnits.VOLTS
             )
-            task.write(voltages, auto_start=True) # type: ignore
-            self.voltage = target_voltage
-            while not self.thread_stop.is_set():
-                task.write(target_voltage, auto_start=True) # type: ignore
-            task.write(voltages_down)
-            self.voltage = 0
-        self.setupManager.log_info(f"(NIDAQ {self.activation_module}/ao{self.id}) Voltage activation thread stopped.")
-
-    def stop_voltage_thread(self):
-        """
-        Stops the voltage thread.
-        """
-        if self.thread is not None:
-            if self.thread.is_alive():
-                self.thread_stop.set()
-                self.setupManager.log_info(f"(NIDAQ {self.activation_module}/ao{self.id} The activation thread was stopped.")                
-            else:
-                self.setupManager.log_warning(f"(NIDAQ {self.activation_module}/ao{self.id} The activation thread was already stopped.")
-        else:
-            self.setupManager.log_warning(f"(NIDAQ {self.activation_module}/ao{self.id} There was no activation thread to stop.")            
+            task.write(target_voltage, auto_start=True) # type: ignore
+            self.voltage = target_voltage 
 
     def measure_voltage(self) -> float:
         with nidaqmx.Task() as task:
@@ -402,8 +342,6 @@ class NIDAQ_chassis():
         # self.setupManager.wait_for_user_input()
         self._calibrate_to_zero_all()
 
-
-
     def start_active_all_channels(self, continous = False):
         """
         Activates all channels with the voltages provided in `self.activation_voltages`.
@@ -414,10 +352,18 @@ class NIDAQ_chassis():
                 self.setupManager.log_info(f"(NIDAQ Channel {channel}) Voltage {voltage}V applied.")
                 self.activation_channels[channel].set_voltage(voltage, continous)
 
-    def stop_any_activation_thread(self):
-        for channel in self.activation_voltages.keys():
-            self.activation_channels[channel].stop_voltage_thread()
+    def set_voltage(self, id: int, target_voltage, ramp: bool = False):
+        if ramp:
+            self.activation_channels[id].ramp_to_voltage(target_voltage)
+        else:
+            self.activation_channels[id].set_voltage(target_voltage, False)
 
+    def measure_current(self, id: int):
+        self.readout_channels[id].measure_current()
+
+    def measure_voltage(self, id: int):
+        self.readout_channels[id].measure_voltage()
+        
     def _calibrate_to_zero_all(self):
         """
         Puts all channels to 0V.

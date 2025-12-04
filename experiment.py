@@ -17,6 +17,10 @@ class Experiment(ABC):
     def run(self) -> None:
         pass
 
+    @abstractmethod
+    def shutdown(self) -> None:
+        pass
+
 class RNPU_Experiment(Experiment):
     """
     RNPU_Experiment handles the execution of experiments using SMU and NIDAQ equipment.
@@ -56,3 +60,24 @@ class RNPU_Experiment(Experiment):
 
     def shutdown(self):
         self.nidaq.shutdown()
+
+class NGR_Experiment(Experiment):
+    def __init__(self, setupManager: SetupManager) -> None:
+        self.setupManager: SetupManager = setupManager
+        self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
+        self.smu: SMU = SMU(setupManager)
+        atexit.register(self.shutdown)
+
+    def run(self):
+        self.nidaq.start_active_all_channels(continous=True)
+        currents = []
+        input_data = self.setupManager.get_input_data()
+        for index, input_voltage in enumerate(input_data):
+            self.nidaq.set_voltage(5, input_voltage, False)
+            currents.append(self.smu.measure_current())
+            self.setupManager.log_info(f"Voltage @ {input_voltage}V, {index}/{len(input_data)}")
+        self.setupManager.write_current(currents)
+
+    def shutdown(self):
+        self.nidaq.shutdown()
+        self.smu.shutdown()
