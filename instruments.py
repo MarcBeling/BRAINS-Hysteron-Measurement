@@ -94,7 +94,7 @@ class SMU():
         :rtype: float
         """
         self.device.measure_current()
-        current = self.device.read()
+        current = self.device.current
         if current != None:
             return current # type: ignore
         else:
