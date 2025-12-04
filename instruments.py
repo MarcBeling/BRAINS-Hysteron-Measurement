@@ -58,13 +58,10 @@ class SMU():
         self.setupManager.log_info(f"Compliance current: {self.compliance_current}") 
         self.setupManager.wait_for_user_input()
 
-
         self.device.enable_source()
-
         self.device.use_front_terminals()
         self.device.current_nplc = 1
         self.device.source_delay = 0.05
-
         self.device.trigger_count = 1
 
 
@@ -111,9 +108,7 @@ class SMU():
         :type voltage: float
         """
         if self.drive_mode == self.VOLTAGE:
-            self.device.ramp_to_voltage(target_voltage = voltage,
-                                        steps=self.setupManager.get_setup_config()['ramp_points'],  #type: ignore
-                                        pause=self.config['pause_between_set'])
+            self.device.source_voltage = voltage
         else:
             self.setupManager.log_warning("(SMU) Tried applying voltage in current driven mode.") 
         pass
@@ -130,9 +125,7 @@ class SMU():
         :type voltage: float
         """
         if self.drive_mode == self.CURRENT:
-            self.device.ramp_to_current(target_current=current,
-                                        steps=self.setupManager.get_setup_config()['ramp_points'],
-                                        pause=self.config['pause_between_set'])
+            self.device.source_current = current
         else:
             self.setupManager.log_warning("(SMU) Tried applying current in voltage driven mode.") 
 

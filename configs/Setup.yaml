@@ -1,11 +1,11 @@
-name: "Standard IV Curve Run"
-description: "This experiment is meant to show that the sample is fine, and the setup works without any control voltages"
+name: "IV Curve Run"
+description: "Test Run on resistors to check SMU."
 
-min_value: -1.2
-max_value: 1.2
+min_value: -2
+max_value: 2
 data_density: 30
 voltage_range: [-3, 3]
-current_range: [-0.01, 0.01]
+current_range: [-0.4, 0.4]
 amplification: 28
 ramp_points: 1000
 
@@ -15,7 +15,7 @@ nidaq:
   sample_frequency: 10000.0
   update_frequency: 1000.0
   samples_per_measurement: 5
-  readout_channels: [14] # 0-7
+  readout_channels: [4] # 0-7
   control_voltages:
     5: 0
 
@@ -23,7 +23,7 @@ nidaq:
 smu:
   device_id: 'GPIB0::15::INSTR'
   timeout: 50000
-  drive_mode: 'CURRENT_DRIVEN'
+  drive_mode: 'VOLTAGE_DRIVEN'
   tolerance_voltage: 0.01
   tolerance_current: 10e-9
   pause_between_set: 0.02
