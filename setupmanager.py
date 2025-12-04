@@ -6,6 +6,7 @@ from configreader import Config
 from waveform import Waveform, WaveType
 import numpy as np
 from typing import List, Dict
+import matplotlib.pyplot as plt
 
 class Singleton(type):
     """Metaclass to enforce Singleton behavior."""
@@ -171,6 +172,8 @@ class SetupManager(metaclass=Singleton):
         with open(self.output_current_file, "a") as f:
             f.write("\n".join(",".join(map(str, row)) for row in array))
 
+    def write_current_numpy(self, currents: np.ndarray):
+            np.savetxt(self.output_current_file, currents, delimiter=",")
 
     def log_info(self, message: str):
         """
@@ -232,6 +235,15 @@ class SetupManager(metaclass=Singleton):
                 exit(0)  # Terminates the program
             else:
                 print("Invalid input. Please enter Y or N.")
+
+
+    def get_current_data(self):
+        return np.loadtxt(self.output_current_file, delimiter=",")
+
+    def plot(self):
+        plt.plot(self.get_input_data(), self.get_current_data())
+        plt.grid()
+        plt.show()
 
     def _on_exit(self):
         """

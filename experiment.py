@@ -76,7 +76,7 @@ class NGR_Experiment(Experiment):
             self.nidaq.set_voltage(5, input_voltage, False)
             currents.append(self.smu.measure_current())
             self.setupManager.log_info(f"Voltage @ {input_voltage}V, {index}/{len(input_data)}")
-        self.setupManager.write_current(currents)
+        self.setupManager.write_current_numpy(np.asarray(currents))
 
     def shutdown(self):
         self.nidaq.shutdown()

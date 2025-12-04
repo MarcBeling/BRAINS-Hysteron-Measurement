@@ -194,7 +194,6 @@ class SMU():
         """
         self.set_current(0)
         self.set_voltage(0)
-        self.device.disable_source()
         self.device.shutdown()
         self.setupManager.log_info("SMU shutdown.")
 

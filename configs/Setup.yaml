@@ -1,5 +1,5 @@
-name: "NGR Proof"
-description: "This shows that the RNPU still shows NGR."
+name: "Standard IV Curve Run"
+description: "This experiment is meant to show that the sample is fine, and the setup works without any control voltages"
 
 min_value: -1.2
 max_value: 1.2
@@ -18,12 +18,6 @@ nidaq:
   readout_channels: [] # 0-7
   control_voltages:
     5: 0
-    9: -0.70795244
-    8: -0.99676251
-    13: -0.69912177
-    14: 0.72853076
-    15: -0.63085985
-    6: -0.30407035
 
 
 smu:

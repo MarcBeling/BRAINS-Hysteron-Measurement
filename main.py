@@ -11,10 +11,8 @@ if __name__=="__main__":
     experiment: ep.NGR_Experiment = ep.NGR_Experiment(setupManager)
     try:
         experiment.run()
+        setupManager.plot()
     except KeyboardInterrupt:
         pass
-    finally:
-        setupManager.log_warning("Program interrupted by user.")
-        experiment.shutdown()
         
 
