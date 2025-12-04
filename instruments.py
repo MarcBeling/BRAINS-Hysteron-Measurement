@@ -37,13 +37,20 @@ class SMU():
         self.compliance_voltage: float = np.min(np.abs(self.setupManager.get_voltage_range()))  
         self.compliance_current: float = np.min(np.abs(self.setupManager.get_current_range()))  
         drive_mode = self.config['drive_mode'] 
+        self.device = self._get_device()
+        self.device.ramp_to_current(0)
+        self.device.ramp_to_voltage(0)
+        self.device.reset()
+        self.device.clear()
         if drive_mode == 'CURRENT_DRIVEN':
             self.drive_mode = self.CURRENT
+            self.device.apply_current()
         elif drive_mode == 'VOLTAGE_DRIVEN':
             self.drive_mode = self.VOLTAGE
+            self.device.apply_voltage()
         else:
             raise BadConfigError(f'Invalid SMU drive mode {drive_mode}. Only "CURRENT_DRIVEN and "VOLTAGE_DRIVEN" are allowed.')         
-        self.device = self._get_device()
+
         self.device.compliance_voltage = np.min(np.abs(self.setupManager.get_voltage_range()))  
         self.device.compliance_current = np.min(np.abs(self.setupManager.get_current_range())) 
         
@@ -51,11 +58,16 @@ class SMU():
         self.setupManager.log_info(self.device.id) 
         self.setupManager.log_info(f"Compliance voltage: {self.compliance_voltage}") 
         self.setupManager.log_info(f"Compliance current: {self.compliance_current}") 
+        self.setupManager.wait_for_user_input()
 
-        self.setupManager.log_info("Device is calibrated, measured voltages and currents are within tolerance") #type: ignore
-        self.setupManager.wait_for_user_input() 
-        self.set_voltage(0)
-        self.set_current(0)
+
+        self.device.enable_source()
+
+        self.device.use_front_terminals()
+        self.device.current_nplc = 1
+        self.device.source_delay = 0.05
+
+        self.device.trigger_count = 1
 
 
     def measure_voltage(self) -> float:
@@ -82,7 +94,7 @@ class SMU():
         :rtype: float
         """
         self.device.measure_current()
-        current = self.device.current
+        current = self.device.read()
         if current != None:
             return current # type: ignore
         else:
@@ -182,6 +194,8 @@ class SMU():
         """
         self.set_current(0)
         self.set_voltage(0)
+        self.device.disable_source()
+        self.device.adapter.connection.close()
         self.device.shutdown()
 
 
@@ -220,7 +234,7 @@ class NIDAQ_channel():
         self.current_amplification = self.setupManager.get_setup_config()['amplification']
         self.voltage = 0
 
-    def set_voltage(self, target_voltage: float, continous: bool):
+    def set_voltage(self, target_voltage: float):
         """
         Set the voltage output of the analog output channel.
         Args:
@@ -342,7 +356,7 @@ class NIDAQ_chassis():
         # self.setupManager.wait_for_user_input()
         self._calibrate_to_zero_all()
 
-    def start_active_all_channels(self, continous = False):
+    def start_active_all_channels(self):
         """
         Activates all channels with the voltages provided in `self.activation_voltages`.
         
@@ -350,13 +364,13 @@ class NIDAQ_chassis():
         """
         for channel, voltage in self.activation_voltages.items():
                 self.setupManager.log_info(f"(NIDAQ Channel {channel}) Voltage {voltage}V applied.")
-                self.activation_channels[channel].set_voltage(voltage, continous)
+                self.activation_channels[channel].set_voltage(voltage)
 
     def set_voltage(self, id: int, target_voltage, ramp: bool = False):
         if ramp:
             self.activation_channels[id].ramp_to_voltage(target_voltage)
         else:
-            self.activation_channels[id].set_voltage(target_voltage, False)
+            self.activation_channels[id].set_voltage(target_voltage)
 
     def measure_current(self, id: int):
         self.readout_channels[id].measure_current()

@@ -42,7 +42,7 @@ class RNPU_Experiment(Experiment):
         atexit.register(self.shutdown)
         
     def run(self):
-        self.nidaq.start_active_all_channels(continous=False)
+        self.nidaq.start_active_all_channels()
         voltages: List[Dict[int, float]] = []
         currents: List[Dict[int, float]] = []
         i = 0
@@ -69,7 +69,7 @@ class NGR_Experiment(Experiment):
         atexit.register(self.shutdown)
 
     def run(self):
-        self.nidaq.start_active_all_channels(continous=True)
+        self.nidaq.start_active_all_channels()
         currents = []
         input_data = self.setupManager.get_input_data()
         for index, input_voltage in enumerate(input_data):

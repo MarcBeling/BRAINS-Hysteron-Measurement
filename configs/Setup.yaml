@@ -1,8 +1,8 @@
 name: "NGR Proof"
-description: "This shows that the RNPU still shows NGR"
+description: "This shows that the RNPU still shows NGR."
 
-min_value: -150e-9
-max_value: 150e-9
+min_value: -1.2
+max_value: 1.2
 data_density: 30
 voltage_range: [-3, 3]
 current_range: [-0.01, 0.01]
@@ -17,6 +17,7 @@ nidaq:
   samples_per_measurement: 5
   readout_channels: [] # 0-7
   control_voltages:
+    5: 0
     9: -0.70795244
     8: -0.99676251
     13: -0.69912177

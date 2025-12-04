@@ -1,14 +1,14 @@
 from configreader import Config
 from pathlib import Path
 from setupmanager import SetupManager
-from experiment import RNPU_Experiment
+import experiment as ep
 
 CONFIG_SETUP = Config(str(Path('configs')/'Setup.yaml'))
 
 if __name__=="__main__":
 
     setupManager: SetupManager = SetupManager(CONFIG_SETUP)
-    experiment: RNPU_Experiment = RNPU_Experiment(setupManager)
+    experiment: ep.NGR_Experiment = ep.NGR_Experiment(setupManager)
     try:
         experiment.run()
     except KeyboardInterrupt:
