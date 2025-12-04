@@ -1,3 +1,9 @@
-\__pycache__
+__pycache__
 \*.pyc
 *.pyc
+__pycache__/configreader.cpython-39.pyc
+__pycache__/errors.cpython-39.pyc
+__pycache__/experiment.cpython-39.pyc
+__pycache__/instruments.cpython-39.pyc
+__pycache__/setupmanager.cpython-39.pyc
+__pycache__/waveform.cpython-39.pyc
