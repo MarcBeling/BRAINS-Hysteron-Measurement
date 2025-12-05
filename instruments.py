@@ -363,6 +363,7 @@ class NIDAQ_chassis():
             self.activation_channels[id].ramp_to_voltage(target_voltage)
         else:
             self.activation_channels[id].set_voltage(target_voltage)
+        self.setupManager.log_info(f"(NIDAQ Channel {id}) Voltage {target_voltage}V applied.")
 
     def measure_current(self, id: int) -> float:
         return self.readout_channels[id].measure_current()

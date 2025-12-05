@@ -69,16 +69,34 @@ class NGR_Experiment(Experiment):
 
     def run(self):
         self.nidaq.start_active_all_channels()
-        voltages = []
+        currents = []
         input_data = self.setupManager.get_input_data()
-        for index, input_current in enumerate(input_data):
-            self.smu.set_current(input_current)
-            drive_voltage = self.smu.measure_voltage()
-            voltages.append(self.nidaq.measure_voltage(4))
-            self.setupManager.log_info(f"Current @ {input_current:.2g}A / {drive_voltage:.2g}V , \t{index+1}/{len(input_data)}")
-            time.sleep(0.1)
-        self.setupManager.write_current_numpy(np.asarray(voltages))
+        for index, input_voltage in enumerate(input_data):
+            self.smu.set_voltage(input_voltage)
+            drive_current = self.smu.measure_current()
+            currents.append(self.nidaq.measure_current(5))
+            self.setupManager.log_info(f"Voltage @ {input_voltage:.2g}V/{drive_current}A \t{index+1}/{len(input_data)}")
+        self.setupManager.write_current_numpy(np.asarray(currents))
 
     def shutdown(self):
         self.nidaq.shutdown()
         self.smu.shutdown()
+
+class VI_NIDAQ_Only(Experiment):
+    def __init__(self, setupManager: SetupManager) -> None:
+        self.setupManager: SetupManager = setupManager
+        self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
+        atexit.register(self.shutdown)
+
+    def run(self):
+        self.nidaq.start_active_all_channels()
+        currents = []
+        input_data = self.setupManager.get_input_data()
+        for index, input_voltage in enumerate(input_data):
+            self.nidaq.set_voltage(6, input_voltage)
+            currents.append(self.nidaq.measure_current(13))
+            self.setupManager.log_info(f"Voltage @ {input_voltage:.2g}V/ \t{index+1}/{len(input_data)}")
+        self.setupManager.write_current_numpy(np.asarray(currents))
+
+    def shutdown(self):
+        self.nidaq.shutdown()
