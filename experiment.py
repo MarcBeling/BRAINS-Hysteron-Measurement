@@ -38,7 +38,7 @@ class RNPU_Experiment(Experiment):
     """
     def __init__(self, setupManager: SetupManager) -> None:
         self.setupManager: SetupManager = setupManager
-        # self.smu: SMU = SMU(setupManager)
+        self.smu: SMU = SMU(setupManager)
         self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
         atexit.register(self.shutdown)
         
@@ -46,21 +46,19 @@ class RNPU_Experiment(Experiment):
         self.nidaq.start_active_all_channels()
         voltages: List[Dict[int, float]] = []
         currents: List[Dict[int, float]] = []
-        i = 0
-        for input_current in self.setupManager.get_input_data():
-            # self.smu.set_current(input_current)
+        input_data = self.setupManager.get_input_data()
+        for index, input_current in enumerate(input_data):
+            self.smu.set_current(input_current)
+            drive_voltage = self.smu.measure_voltage()
             voltages.append(self.nidaq.measure_current_all_channels())
-            currents.append(self.nidaq.measure_voltage_all_channels())
-            print(f"Loop {i}")
-            i = i + 1
+            self.setupManager.log_info(f"Current @ {input_current:.2g}A / {drive_voltage:.2g}V , \t{index+1}/{len(input_data)}")
     
         self.setupManager.write_voltage(voltages)
-        self.setupManager.write_current(currents)
-
         self.shutdown()
 
     def shutdown(self):
         self.nidaq.shutdown()
+        self.smu.shutdown()
 
 class NGR_Experiment(Experiment):
     def __init__(self, setupManager: SetupManager) -> None:

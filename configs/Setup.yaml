@@ -1,11 +1,11 @@
-name: "VI_Contrl"
-description: "Test Run on resistors to check SMU."
+name: "NGR_ControlVolt"
+description: "Test Run on DNPU to check Device Connectivety"
 
-min_value: -4e-9
-max_value: 4e-9
+min_value: -1.5e-9
+max_value: 1.5e-9
 data_density: 30
 voltage_range: [-2.5, 2.5]
-current_range: [-0.4, 0.4]
+current_range: [-0.2e-9, 0.2e-9]
 amplification: 28
 ramp_points: 1000
 
@@ -15,11 +15,14 @@ nidaq:
   sample_frequency: 10000.0
   update_frequency: 1000.0
   samples_per_measurement: 5
-  readout_channels: [4] # 0-7
+  readout_channels: [5] # 0-7
   control_voltages:
-    7: 0.5
-    9: 1.0
-    3: 2.0
+    14: -0.9537282
+    15: -0.03505099
+    6: -0.70736569
+    9: -0.868963
+    8: -0.94302171
+    13: 0.10010684
 
 smu:
   device_id: 'GPIB0::15::INSTR'

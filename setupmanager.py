@@ -239,6 +239,9 @@ class SetupManager(metaclass=Singleton):
 
     def get_current_data(self):
         return np.loadtxt(self.output_current_file, delimiter=",")
+    
+    def get_voltage_data(self):
+        return np.loadtxt(self.output_voltage_file, delimiter=",")
 
     def plot(self):
         plt.plot(self.get_input_data(), self.get_current_data())
