@@ -71,14 +71,15 @@ class NGR_Experiment(Experiment):
 
     def run(self):
         self.nidaq.start_active_all_channels()
-        currents = []
+        voltages = []
         input_data = self.setupManager.get_input_data()
-        for index, input_voltage in enumerate(input_data):
-            self.smu.set_voltage(input_voltage)
-            currents.append(self.nidaq.measure_current(4))
-            self.setupManager.log_info(f"Voltage @ {input_voltage}V, \t{index+1}/{len(input_data)}")
+        for index, input_current in enumerate(input_data):
+            self.smu.set_current(input_current)
+            drive_voltage = self.smu.measure_voltage()
+            voltages.append(self.nidaq.measure_voltage(4))
+            self.setupManager.log_info(f"Current @ {input_current:.2g}A / {drive_voltage:.2g}V , \t{index+1}/{len(input_data)}")
             time.sleep(0.1)
-        self.setupManager.write_current_numpy(np.asarray(currents))
+        self.setupManager.write_current_numpy(np.asarray(voltages))
 
     def shutdown(self):
         self.nidaq.shutdown()

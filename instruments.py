@@ -43,9 +43,11 @@ class SMU():
         if drive_mode == 'CURRENT_DRIVEN':
             self.drive_mode = self.CURRENT
             self.device.apply_current()
+            self.device.measure_voltage()
         elif drive_mode == 'VOLTAGE_DRIVEN':
             self.drive_mode = self.VOLTAGE
             self.device.apply_voltage()
+            self.device.measure_current()
         else:
             raise BadConfigError(f'Invalid SMU drive mode {drive_mode}. Only "CURRENT_DRIVEN and "VOLTAGE_DRIVEN" are allowed.')         
 
@@ -58,9 +60,11 @@ class SMU():
         self.setupManager.log_info(f"Compliance current: {self.compliance_current}") 
         self.setupManager.wait_for_user_input()
 
-        self.device.enable_source()
+
         self.device.use_front_terminals()
+        self.device.enable_source()
         self.device.current_nplc = 1
+        self.device.voltage_nplc = 1
         self.device.source_delay = 0.05
         self.device.trigger_count = 1
 

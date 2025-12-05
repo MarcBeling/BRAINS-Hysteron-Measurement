@@ -1,10 +1,10 @@
-name: "IV Curve Run"
+name: "VI_Contrl"
 description: "Test Run on resistors to check SMU."
 
-min_value: -2
-max_value: 2
+min_value: -4e-9
+max_value: 4e-9
 data_density: 30
-voltage_range: [-3, 3]
+voltage_range: [-2.5, 2.5]
 current_range: [-0.4, 0.4]
 amplification: 28
 ramp_points: 1000
@@ -17,13 +17,14 @@ nidaq:
   samples_per_measurement: 5
   readout_channels: [4] # 0-7
   control_voltages:
-    5: 0
-
+    7: 0.5
+    9: 1.0
+    3: 2.0
 
 smu:
   device_id: 'GPIB0::15::INSTR'
   timeout: 50000
-  drive_mode: 'VOLTAGE_DRIVEN'
+  drive_mode: 'CURRENT_DRIVEN'
   tolerance_voltage: 0.01
   tolerance_current: 10e-9
   pause_between_set: 0.02
