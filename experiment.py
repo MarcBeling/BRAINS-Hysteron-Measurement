@@ -93,9 +93,9 @@ class VI_NIDAQ_Only(Experiment):
         currents = []
         input_data = self.setupManager.get_input_data()
         for index, input_voltage in enumerate(input_data):
-            self.nidaq.set_voltage(6, input_voltage)
-            currents.append(self.nidaq.measure_current(13))
-            self.setupManager.log_info(f"Voltage @ {input_voltage:.2g}V/ \t{index+1}/{len(input_data)}")
+            self.nidaq.set_voltage(12, input_voltage)
+            currents.append(self.nidaq.measure_current(10))
+            self.setupManager.log_info(f"Voltage @ {input_voltage:.2g}V |\t{index+1}/{len(input_data)}")
         self.setupManager.write_current_numpy(np.asarray(currents))
 
     def shutdown(self):
