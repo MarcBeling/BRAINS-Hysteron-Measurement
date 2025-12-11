@@ -1,8 +1,8 @@
-name: "DNPU_Closed_Box_Measurement"
+name: "IV_DNPU_Voltage_Measurement"
 description: "Run with a DNPU and with no control voltages and larger voltage range to check for offsets in the device."
 
-min_value: -2.0
-max_value: 2.0
+min_value: -1.5
+max_value: 1.5
 data_density: 40
 voltage_range: [-2.0, 2.0]
 current_range: [-0.2e-6, 0.2e-6]
