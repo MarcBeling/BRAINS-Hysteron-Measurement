@@ -11,7 +11,7 @@ if __name__=="__main__":
     experiment: ep.VI_NIDAQ_Only = ep.VI_NIDAQ_Only(setupManager)
     try:
         experiment.run()
-        setupManager.plot()
+        # setupManager.plot()
     except KeyboardInterrupt:
         pass
         

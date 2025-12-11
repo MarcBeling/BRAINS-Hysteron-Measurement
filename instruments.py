@@ -356,14 +356,13 @@ class NIDAQ_chassis():
         """
         for channel, voltage in self.activation_voltages.items():
                 self.setupManager.log_info(f"(NIDAQ Channel {channel}) Voltage {voltage}V applied.")
-                self.activation_channels[channel].set_voltage(voltage)
+                self.activation_channels[channel].ramp_to_voltage(voltage)
 
     def set_voltage(self, id: int, target_voltage, ramp: bool = False):
         if ramp:
             self.activation_channels[id].ramp_to_voltage(target_voltage)
         else:
             self.activation_channels[id].set_voltage(target_voltage)
-        self.setupManager.log_info(f"(NIDAQ Channel {id}) Voltage {target_voltage}V applied.")
 
     def measure_current(self, id: int) -> float:
         return self.readout_channels[id].measure_current()
