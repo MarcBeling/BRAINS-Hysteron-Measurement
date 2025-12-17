@@ -45,7 +45,7 @@ class SetupManager(metaclass=Singleton):
         self.output_current_file: Path = save_name/"output_current.csv"
         self.log_file: Path = save_name/"setup.LOG"
         self.input_file: Path = save_name/"input_current.csv"
-
+        self.save_name = save_name
         self.terminated_normally = True
 
         # Create folder if it doesn't exist
@@ -71,7 +71,7 @@ class SetupManager(metaclass=Singleton):
         """
         return self.config['voltage_range']
     
-    def get_current_range(self) -> List[float]:
+    def get_current_range(self) -> np.ndarray:
         """
         Gets the current range from the configuration.
         
@@ -79,7 +79,7 @@ class SetupManager(metaclass=Singleton):
         :return: List of current range values, of the format [current_min, current_max]
         :rtype: List[float]
         """
-        return self.config['current_range']
+        return np.array([float(x) for x in self.config['current_range']])
 
     def get_input_data(self) -> np.ndarray:
         """

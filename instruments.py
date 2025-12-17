@@ -58,7 +58,7 @@ class SMU():
         self.setupManager.log_info(self.device.id) 
         self.setupManager.log_info(f"Compliance voltage: {self.compliance_voltage}") 
         self.setupManager.log_info(f"Compliance current: {self.compliance_current}") 
-        self.setupManager.wait_for_user_input()
+        # self.setupManager.wait_for_user_input()
 
 
         self.device.use_front_terminals()
@@ -219,7 +219,6 @@ class NIDAQ_channel():
         self.activation_module: str = activation_module
         self.readout_module: str = readout_module
         self.sample_frequency = self.setupManager.get_setup_config()['nidaq']['sample_frequency']
-        self.update_period = 1/(self.setupManager.get_setup_config()['nidaq']['update_frequency'])
         self.averaging = self.setupManager.get_setup_config()['nidaq']['samples_per_measurement'] 
         self.min_voltage = self.setupManager.get_voltage_range()[0]
         self.max_voltage = self.setupManager.get_voltage_range()[1]
@@ -285,13 +284,13 @@ class NIDAQ_channel():
                     f"{self.activation_module}/ao{self.id}",
                     min_val=self.min_voltage,
                     max_val=self.max_voltage,
-                    units=VoltageUnits.VOLTS
+                    units=VoltageUnits.VOLTS,
                 )
                 task.write(voltages, auto_start=True) # type: ignore
             self.voltage = target_voltage
         except DaqError as e:
             self.setupManager.log_error(f"(NIDAQ Channel {self.activation_module}/ao{self.id}) Failed to set voltage: {e}")
-          
+
     def __str__(self) -> str:
         return str(self.id)
 

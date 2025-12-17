@@ -12,6 +12,7 @@ class WaveType(Enum):
     SAWTOOTH = 0
     LINSPACE = 1
     WILFRED = 2
+    REZA = 3
 
 class Waveform():
     """
@@ -33,6 +34,8 @@ class Waveform():
             self.generate_linspace()
         elif type == WaveType.WILFRED:
             self.generate_wilfred()
+        elif type == WaveType.REZA:
+            self.generate_reza()
         else:
             raise ValueError('Unfamiliar WaveType Enum.')
         
@@ -44,13 +47,27 @@ class Waveform():
         return self
     
     def generate_wilfred(self):
-        step1 = np.linspace(0, self.min_value, self.data_per_sec)
-        step2 = np.linspace(self.min_value, self.max_value, 2 * self.data_per_sec)
-        step3 = np.linspace(self.max_value, self.min_value, 2 * self.data_per_sec)
-        step4 = np.linspace(self.min_value, self.max_value, 2 * self.data_per_sec)
-        step5 = np.linspace(self.max_value, 0, self.data_per_sec)
-        self._data = np.concatenate((step1, step2, step3, step4, step5))
+        ramp_start = np.linspace(0, self.min_value, 20) # 10s
+        rest = np.linspace(self.min_value, self.min_value, 40) # 20
+        step1 = np.linspace(self.min_value, self.max_value, 2 * self.data_per_sec)
+        step2 = np.linspace(self.max_value, self.min_value, 2 * self.data_per_sec)
+        step3 = np.linspace(self.min_value, self.max_value, 2 * self.data_per_sec)
+        rest2 = np.linspace(self.max_value, self.max_value, 40) # 20
+        ramp_reset = np.linspace(self.max_value, 0, 20) # 10s
+        self._data = np.concatenate((ramp_start, rest, step1, step2, step3, rest2, ramp_reset))
         return self
+    
+    def generate_reza(self):
+        ramp_start = np.linspace(0, self.min_value, 20) # 10s
+        rest = np.linspace(self.min_value, self.min_value, 40) # 20
+        ramp_up = np.linspace(self.min_value, self.max_value, self.data_per_sec)
+        ramp_down = np.linspace(self.max_value, self.min_value, self.data_per_sec)
+        ramp_up = np.linspace(self.min_value, self.max_value, self.data_per_sec)
+        ramp_down = np.linspace(self.max_value, self.min_value, self.data_per_sec)
+        rest = np.linspace(self.min_value, self.min_value, 40) # 20
+        ramp_reset = np.linspace(self.min_value, 0, 20) # 10s
+        self._data = np.concatenate((ramp_start, rest, ramp_up, ramp_down, ramp_up, ramp_down, rest, ramp_reset))        
+
     
     def clip_waveform(self, min_value, max_value):
         self._data = np.clip(self._data, min_value, max_value)
