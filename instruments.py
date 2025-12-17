@@ -277,7 +277,7 @@ class NIDAQ_channel():
     def ramp_to_voltage(self, target_voltage: float):
         voltages = np.linspace(start=self.voltage,
                             stop=target_voltage,
-                            num=self.setupManager.get_setup_config()['ramp_points']) 
+                            num=self.setupManager.get_setup_config()['nidaq']['ramp_points']) 
         try:
             with nidaqmx.Task() as task:
                 task.ao_channels.add_ao_voltage_chan(

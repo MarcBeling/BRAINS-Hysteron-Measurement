@@ -111,10 +111,18 @@ class SetupManager(metaclass=Singleton):
         
         :param self: Instance of SetupManager
         """
-        content = str(Waveform(WaveType.WILFRED,
+        if self.config['waveform'] == "WILFRED":
+            content = str(Waveform(WaveType.WILFRED,
                            self.config['min_value'],
                            self.config['max_value'],
                            self.config['data_density']))
+        elif self.config['waveform'] == "REZA":
+            content = str(Waveform(WaveType.REZA,
+                           self.config['min_value'],
+                           self.config['max_value'],
+                           self.config['data_density']))
+        else:
+            raise ValueError("Incorrect Waveform Keyword provided")        
         with open(self.input_file, "a") as file:
             file.write(content) 
 
