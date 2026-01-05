@@ -2,7 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "main.py",
+            "name": "Plotting",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/plotter.py",
+            "console": "integratedTerminal",
+            
+            "args": [   "voltage_ei.csv",
+                        "currents_eo.csv",
+                        "IV_RNPU_3T-2026-01-05_10-28-48",
+                        "IV",
+                        "IV Plot e_i -> e_o: 3 Terminal RNPU with 250mV Control Voltages."
+                    ]
+        },
+
+        {
+            "name": "Experiment",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/main.py",

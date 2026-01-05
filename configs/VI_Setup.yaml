@@ -1,7 +1,7 @@
-name: "IV_RNPU_3T"
+name: "VI_RNPU_3T"
 description: "Refactored the SetupManager to make data analysis easier."
-min_value: -1.5
-max_value: 1.5
+min_value: -100e-9
+max_value: 100e-9
 data_density: 60
 voltage_range: [-2.0, 2.0]
 current_range: [-500e-9, 500e-9]

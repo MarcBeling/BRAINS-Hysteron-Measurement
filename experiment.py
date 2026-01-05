@@ -55,11 +55,12 @@ class VI_SMU_NIDAQ(Experiment):
 
             self.smu.set_current(input_current)
 
-            current_eo = self.nidaq.measure_voltage(2)
-            current_ec = self.nidaq.measure_voltage(3)
             voltage_ei = self.smu.measure_voltage()
 
             if index >= 60 and index < (len(currents_ei)-60):
+
+                current_eo = self.nidaq.measure_voltage(2)
+                current_ec = self.nidaq.measure_voltage(3)
 
                 currents_eo.append(current_eo)
                 currents_ec.append(current_ec)
@@ -97,13 +98,15 @@ class IV_SMU_NIDAQ(Experiment):
 
             self.smu.set_voltage(input_voltage)
 
-            current_eo = self.nidaq.measure_voltage(2)
-            current_ec = self.nidaq.measure_voltage(3)
             current_ei = self.smu.measure_current()
 
             self.setupManager.log_info(f"Voltage @ {input_voltage:.2g}V & {current_ei}A |\t{index+1}/{len(voltage_ei)}")
 
-            if index >= 60 and index < (len(input_voltage) - 60):
+            if index >= 60 and index < (len(voltage_ei) - 60):
+
+                current_eo = self.nidaq.measure_voltage(2)
+                current_ec = self.nidaq.measure_voltage(3)
+
                 currents_eo.append(current_eo)
                 currents_ec.append(current_ec)
                 currents_ei.append(current_ei)

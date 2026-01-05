@@ -199,4 +199,3 @@ class SetupManager(metaclass=Singleton):
         else:
             self.log_warning("Program terminated by user or unexpectedly")
 
-

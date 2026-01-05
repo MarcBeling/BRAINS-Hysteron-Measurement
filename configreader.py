@@ -74,5 +74,3 @@ class Config():
             else:
                 lines.append(f"{indent}{key}: {value}")
         return "\n".join(lines)
-
-CONFIG_SETUP = Config(str(Path('configs')/'Setup.yaml'))
