@@ -22,7 +22,7 @@ class Experiment(ABC):
     def shutdown(self) -> None:
         pass
 
-class RNPU_Experiment(Experiment):
+class VI_SMU_NIDAQ(Experiment):
     """
     RNPU_Experiment handles the execution of experiments using SMU and NIDAQ equipment.
     This class orchestrates the measurement workflow by:
@@ -43,87 +43,41 @@ class RNPU_Experiment(Experiment):
         atexit.register(self.shutdown)
         
     def run(self):
+
         self.nidaq.start_active_all_channels()
-        voltages: List[Dict[int, float]] = []
-        drive_voltages: List[float] = []
-        input_data = self.setupManager.get_input_data()
-        for index, input_current in enumerate(input_data):
+
+        currents_ei = self.setupManager.get_input_data()
+        currents_eo = []
+        currents_ec = []
+        voltages_ei = []
+
+        for index, input_current in enumerate(currents_ei):
+
             self.smu.set_current(input_current)
-            drive_voltage = self.smu.measure_voltage()
-            if index >= 60 and index < (len(input_data)-60):
-                voltages.append(self.nidaq.measure_voltage_all_channels())
-                drive_voltages.append(drive_voltage)
-            self.setupManager.log_info(f"Current @ {input_current:.2g}A / {drive_voltage:.2g}V \t|{index+1}/{len(input_data)}")
-        self.setupManager.write_current_numpy(np.asarray(drive_voltages))
-        self.setupManager.write_voltage(voltages)
+
+            current_eo = self.nidaq.measure_voltage(2)
+            current_ec = self.nidaq.measure_voltage(3)
+            voltage_ei = self.smu.measure_voltage()
+
+            if index >= 60 and index < (len(currents_ei)-60):
+
+                currents_eo.append(current_eo)
+                currents_ec.append(current_ec)
+                voltages_ei.append(voltage_ei)
+
+            self.setupManager.log_info(f"Current @ {input_current:.2g}A / {voltage_ei:.2g}V \t|{index+1}/{len(currents_ei)}")
+
+        self.setupManager.write_data_to_file("currents_eo.csv", currents_eo)
+        self.setupManager.write_data_to_file("currents_ec.csv", currents_ec)
+        self.setupManager.write_data_to_file("currents_ei.csv", currents_ei)
+        self.setupManager.write_data_to_file("voltages_ei.csv", voltages_ei)
 
     def shutdown(self):
         self.nidaq.shutdown()
-        self.smu.shutdown()
-
-class NGR_Experiment(Experiment):
-    def __init__(self, setupManager: SetupManager) -> None:
-        self.setupManager: SetupManager = setupManager
-        self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
-        self.smu: SMU = SMU(setupManager)
-        atexit.register(self.shutdown)
-
-    def run(self):
-        self.nidaq.start_active_all_channels()
-        currents = []
-        input_data = self.setupManager.get_input_data()
-        for index, input_voltage in enumerate(input_data):
-            self.smu.set_voltage(input_voltage)
-            drive_current = self.smu.measure_current()
-            if index > 60 and index < (len(input_data) - 60):
-                currents.append(self.nidaq.measure_current(5))
-            self.setupManager.log_info(f"Voltage @ {input_voltage:.2g}V/{drive_current}A \t{index+1}/{len(input_data)}")
-        self.setupManager.write_current_numpy(np.asarray(currents))
-
-    def shutdown(self):
-        self.nidaq.shutdown()
-        self.smu.shutdown()
-
-class VI_NIDAQ_Only(Experiment):
-    def __init__(self, setupManager: SetupManager) -> None:
-        self.setupManager: SetupManager = setupManager
-        self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
-        atexit.register(self.shutdown)
-
-    def run(self):
-        self.nidaq.start_active_all_channels()
-        currents = []
-        input_data = self.setupManager.get_input_data()
-        for index, input_voltage in enumerate(input_data):
-            self.nidaq.set_voltage(11, input_voltage)
-            currents.append(self.nidaq.measure_voltage(2))
-            self.setupManager.log_info(f"Voltage @ {input_voltage:.2g}V |\t{index+1}/{len(input_data)}")
-        self.setupManager.write_current_numpy(np.asarray(currents))
-
-    def shutdown(self):
-        self.nidaq.shutdown()
-
-class IV_SMU_ONLY(Experiment):
-    def __init__(self, setupManager: SetupManager) -> None:
-        self.setupManager: SetupManager = setupManager
-        self.smu: SMU = SMU(setupManager)
-        atexit.register(self.shutdown)
-
-    def run(self):
-        currents = []
-        input_data = self.setupManager.get_input_data()
-        for index, input_voltage in enumerate(input_data):
-            self.smu.set_voltage(input_voltage)
-            current = self.smu.measure_current()
-            self.setupManager.log_info(f"Voltage @ {input_voltage:.2g}V |\t{index+1}/{len(input_data)}")
-            if index > 60 and index < (len(input_data) - 60):
-                currents.append(current)
-        self.setupManager.write_current_numpy(np.asarray(currents))
-
-    def shutdown(self):
         self.smu.shutdown()
 
 class IV_SMU_NIDAQ(Experiment):
+
     def __init__(self, setupManager: SetupManager) -> None:
         self.setupManager: SetupManager = setupManager
         self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
@@ -131,20 +85,34 @@ class IV_SMU_NIDAQ(Experiment):
         atexit.register(self.shutdown)
 
     def run(self):
-        currents = []
-        drive_currents = []
+
+        currents_eo = []
+        currents_ec = []
+        currents_ei = []
+        voltage_ei = self.setupManager.get_input_data()
+
         self.nidaq.start_active_all_channels()
-        input_data = self.setupManager.get_input_data()
-        for index, input_voltage in enumerate(input_data):
+
+        for index, input_voltage in enumerate(voltage_ei):
+
             self.smu.set_voltage(input_voltage)
-            current = self.nidaq.measure_voltage_all_channels()
-            drive_current = self.smu.measure_current()
-            self.setupManager.log_info(f"Voltage @ {input_voltage:.2g}V & {drive_current}A |\t{index+1}/{len(input_data)}")
-            if index >= 60 and index < (len(input_data) - 60):
-                currents.append(current)
-                drive_currents.append(drive_current)
-        self.setupManager.write_current_numpy(np.asarray(currents))
-        self.setupManager.write_voltage(drive_currents)
+
+            current_eo = self.nidaq.measure_voltage(2)
+            current_ec = self.nidaq.measure_voltage(3)
+            current_ei = self.smu.measure_current()
+
+            self.setupManager.log_info(f"Voltage @ {input_voltage:.2g}V & {current_ei}A |\t{index+1}/{len(voltage_ei)}")
+
+            if index >= 60 and index < (len(input_voltage) - 60):
+                currents_eo.append(current_eo)
+                currents_ec.append(current_ec)
+                currents_ei.append(current_ei)
+
+        self.setupManager.write_data_to_file("voltage_ei.csv", voltage_ei)
+        self.setupManager.write_data_to_file("currents_eo.csv", currents_eo)
+        self.setupManager.write_data_to_file("currents_ec.csv", currents_ec)
+        self.setupManager.write_data_to_file("currents_ei.csv", currents_ei)
 
     def shutdown(self):
         self.smu.shutdown()
+        self.nidaq.shutdown()

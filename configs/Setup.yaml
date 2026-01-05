@@ -1,8 +1,8 @@
-name: "IV_DNPU_REZA_ALLINFO"
-description: "Testing new configuration. From 10,2,SMU to 3,2,SMU. IV Curve for a 3-terminal DNPU. Control Voltages are applied. SMU is used. 3, 2 connected. Trying to gather as much data as possible."
+name: "IV_RNPU_3T"
+description: "Refactored the SetupManager to make data analysis easier."
 min_value: -1.5
 max_value: 1.5
-data_density: 240
+data_density: 60
 voltage_range: [-2.0, 2.0]
 current_range: [-500e-9, 500e-9]
 amplification: 1
@@ -22,7 +22,7 @@ nidaq:
 smu:
   device_id: 'GPIB0::15::INSTR'
   timeout: 50000
-  drive_mode: 'VOLTAGE_DRIVEN'
+  drive_mode: 'CURRENT_DRIVEN'
   tolerance_voltage: 0.01
   tolerance_current: 10e-9
   pause_between_set: 0.02

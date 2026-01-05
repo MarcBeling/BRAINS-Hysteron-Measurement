@@ -41,10 +41,7 @@ class SetupManager(metaclass=Singleton):
         save_name: Path = Path(f"{self.config['name']}-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}")
         self.root_folder = save_name
         self.metadata_file: Path = save_name/"setup.META"
-        self.output_voltage_file: Path = save_name/"output_voltage.csv"
-        self.output_current_file: Path = save_name/"output_current.csv"
         self.log_file: Path = save_name/"setup.LOG"
-        self.input_file: Path = save_name/"input_current.csv"
         self.save_name = save_name
         self.terminated_normally = True
 
@@ -53,10 +50,8 @@ class SetupManager(metaclass=Singleton):
             os.makedirs(save_name)
 
         self._create_metafile()
-        self._create_input_file()
+        self._create_input_data()
         self.log_file.touch(exist_ok=False)
-        self.output_voltage_file.touch(exist_ok=False)
-        self.output_current_file.touch(exist_ok=False)
         atexit.register(self._on_exit)
 
         self.log_info("SetupManager initialized.")
@@ -89,7 +84,7 @@ class SetupManager(metaclass=Singleton):
         :return: Numpy array containing the input data.
         :rtype: ndarray[Any, Any]
         """
-        return np.loadtxt(self.input_file, delimiter=",")
+        return self.input_data
 
     def get_setup_config(self) -> Config:
         """
@@ -102,29 +97,24 @@ class SetupManager(metaclass=Singleton):
         """
         return self.config
 
-
-    def _create_input_file(self):
-        """
-        Creates a CSV file and fills it with data based on the information in the config setup file.
-        It creates a Waveform of Type Wilfred, generated data from it and formats it into a CSV file.
-        The data generated is exactly what will be used as input in the experiment.
-        
-        :param self: Instance of SetupManager
-        """
+    def _create_input_data(self):
         if self.config['waveform'] == "WILFRED":
-            content = str(Waveform(WaveType.WILFRED,
+            content = Waveform(WaveType.WILFRED,
                            self.config['min_value'],
                            self.config['max_value'],
-                           self.config['data_density']))
+                           self.config['data_density']).get_waveform_data()
         elif self.config['waveform'] == "REZA":
-            content = str(Waveform(WaveType.REZA,
+            content = Waveform(WaveType.REZA,
                            self.config['min_value'],
                            self.config['max_value'],
-                           self.config['data_density']))
+                           self.config['data_density']).get_waveform_data()
         else:
             raise ValueError("Incorrect Waveform Keyword provided")        
-        with open(self.input_file, "a") as file:
-            file.write(content) 
+        self.input_data = content
+
+    def write_data_to_file(self, filename: str, data):
+        filepath = self.root_folder / filename
+        np.savetxt(filepath, data, delimiter=",")
 
     def _create_metafile(self):
         """
@@ -135,53 +125,6 @@ class SetupManager(metaclass=Singleton):
         content = f" === [META INFORMATION - {self.start_time}] === \n" + str(self.config)
         with open(self.metadata_file, "w") as file:
             file.write(content)
-        with open(self.metadata_file, "a") as file:
-            file.write(str(self.config))
-
-    def _create_output_files(self):
-        """
-        Creates empty output files, that later will be filled out by the experiment.
-        
-        :param self: Instance of SetupManager
-        """
-        with open(self.output_voltage_file, "a") as f:
-            f.write(",".join(f"Channel {n}" for n in self.config['nidaq']['readout_channels']))
-        with open(self.output_current_file, "a") as f:
-            f.write(",".join(f"Channel{n}" for n in self.config['nidaq']['readout_channels']))
-
-
-    def write_voltage(self, voltages: List[Dict[int, float]]):
-        """
-        Writes a set of voltages to the voltage output file.
-        
-        :param self: Instance of SetupManager
-        :param voltages: A list of voltages, where each column corresponds to a NIDAQ channel.
-        Each row represents a datapoint for each channel. The key (type: int) of the dict represents the id of the channel.
-        :type voltages: List[Dict[int, float]]
-        """
-        keys = list(voltages[0].keys())
-        rows = [[d[k] for k in keys] for d in voltages]
-        array = np.array(rows)
-        with open(self.output_voltage_file, "a") as f:
-            f.write("\n".join(",".join(map(str, row)) for row in array))
-
-    def write_current(self, currents: List[Dict[int, float]]):
-        """
-        Writes a set of currents to the current output file.
-        
-        :param self: Instance of SetupManager
-        :param currents: A list of currents, where each column corresponds to a NIDAQ channel.
-        Each row represents a datapoint for each channel. The key (type: int) of the dict represents the id of the channel.
-        :type currents: List[Dict[int, float]]
-        """
-        keys = list(currents[0].keys())
-        rows = [[d[k] for k in keys] for d in currents]
-        array = np.array(rows)
-        with open(self.output_current_file, "a") as f:
-            f.write("\n".join(",".join(map(str, row)) for row in array))
-
-    def write_current_numpy(self, currents: np.ndarray):
-            np.savetxt(self.output_current_file, currents, delimiter=",")
 
     def log_info(self, message: str):
         """
@@ -243,18 +186,6 @@ class SetupManager(metaclass=Singleton):
                 exit(0)  # Terminates the program
             else:
                 print("Invalid input. Please enter Y or N.")
-
-
-    def get_current_data(self):
-        return np.loadtxt(self.output_current_file, delimiter=",")
-    
-    def get_voltage_data(self):
-        return np.loadtxt(self.output_voltage_file, delimiter=",")
-
-    def plot(self):
-        plt.plot(self.get_input_data(), self.get_current_data())
-        plt.grid()
-        plt.show()
 
     def _on_exit(self):
         """
