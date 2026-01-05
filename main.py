@@ -12,7 +12,7 @@ if __name__=="__main__":
     experiment: ep.RNPU_Experiment = ep.RNPU_Experiment(setupManager)
     try:
         experiment.run()
-        pt.plot_vi_curve(setupManager.save_name, "input_current.csv", "output_voltage.csv")
+        # pt.plot_iv_curve(setupManager.save_name,'input_current.csv', 'output_current.csv')
     except KeyboardInterrupt:
         pass
         

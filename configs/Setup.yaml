@@ -1,8 +1,8 @@
-name: "IV_DNPU_3T_10_-250mV"
-description: "VI Curve for a 3-terminal DNPU. Control Voltages are applied. SMU is used. 10, 2 connected."
-min_value: -100e-9
-max_value: -50e-9
-data_density: 120
+name: "IV_DNPU_REZA_ALLINFO"
+description: "Testing new configuration. From 10,2,SMU to 3,2,SMU. IV Curve for a 3-terminal DNPU. Control Voltages are applied. SMU is used. 3, 2 connected. Trying to gather as much data as possible."
+min_value: -1.5
+max_value: 1.5
+data_density: 240
 voltage_range: [-2.0, 2.0]
 current_range: [-500e-9, 500e-9]
 amplification: 1
@@ -15,14 +15,14 @@ nidaq:
   update_frequency: 1000.0
   ramp_points: 3000
   samples_per_measurement: 5
-  readout_channels: [2] # 0-7
+  readout_channels: [2, 3] # 0-7
   control_voltages:
-    10: -0.250
+    3: -0.250
 
 smu:
   device_id: 'GPIB0::15::INSTR'
   timeout: 50000
-  drive_mode: 'CURRENT_DRIVEN'
+  drive_mode: 'VOLTAGE_DRIVEN'
   tolerance_voltage: 0.01
   tolerance_current: 10e-9
   pause_between_set: 0.02
