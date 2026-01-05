@@ -1,8 +1,8 @@
-name: "VI_RNPU_3T"
-description: "Refactored the SetupManager to make data analysis easier."
-min_value: -100e-9
-max_value: 100e-9
-data_density: 60
+name: "VI_RNPU_3T_FullRange"
+description: "300mV Control Voltage with 3 Terminal Setup."
+min_value: -150e-9
+max_value: 150e-9
+data_density: 120
 voltage_range: [-2.0, 2.0]
 current_range: [-500e-9, 500e-9]
 amplification: 1
@@ -17,7 +17,7 @@ nidaq:
   samples_per_measurement: 5
   readout_channels: [2, 3] # 0-7
   control_voltages:
-    3: -0.250
+    3: -0.300
 
 smu:
   device_id: 'GPIB0::15::INSTR'
