@@ -10,7 +10,7 @@ from nidaqmx.constants import VoltageUnits, AcquisitionType
 from nidaqmx.errors import DaqError
 from nidaqmx.system import System
 
-from pymeasure.instruments.keithley import Keithley2400
+from pymeasure.instruments.keithley import Keithley2400, Keithley2000
 
 class SMU():
     """
@@ -29,9 +29,9 @@ class SMU():
     CURRENT = 'CURRENT_DRIVEN'
     VOLTAGE = 'VOLTAGE_DRIVEN'
 
-    def __init__(self, setupManager: SetupManager) -> None:
+    def __init__(self, setupManager: SetupManager, config_id: str = "smu") -> None:
         self.setupManager = setupManager
-        self.config = self.setupManager.get_setup_config()['smu']
+        self.config = self.setupManager.get_setup_config()[config_id]
         self.device_id: str = self.config['device_id']
         self.timeout: int = self.config['timeout']
         self.compliance_voltage: float = np.min(np.abs(self.setupManager.get_voltage_range()))  
@@ -184,6 +184,65 @@ class SMU():
         self.device.shutdown()
         self.setupManager.log_info("SMU shutdown.")
 
+class Voltmeter():
+    def __init__(self, setupManager: SetupManager, config_id: str = "voltmeter") -> None:
+        self.setupManager = setupManager
+        self.config = self.setupManager.get_setup_config()[config_id]
+        self._read_config()
+        self.device: Keithley2000 = self._get_device()
+        self.device.reset()
+        self._configure_device()
+
+    def _read_config(self):
+        self.device_id = self.config['device_id']
+        self.timeout = self.config['timeout']
+        self.measurement_mode = self.config['measurement_mode']
+        self.range = self.config["range"]
+        self.trigger_count = self.config["trigger_count"]
+        self.nplc = self.config['nplc']
+
+    def _get_device(self) -> Keithley2000:
+        device: Union[Keithley2000, None] = None
+        try:
+            device = Keithley2000(self.device_id, timeout=self.timeout)
+        except Exception as e:
+            self.setupManager.log_warning(f"Failed to load GPIB library. Continuing without GPIB support.") 
+        if device == None:
+            self.setupManager.log_error('Could not locate a voltmeter device.') 
+            raise DeviceNotFoundError('Voltmeter')
+        return device
+    
+    def _configure_device(self):
+        self.device.voltage_range = self.range
+        self.device.trigger_count = self.trigger_count
+
+        if self.measurement_mode == 'voltage':
+            self.device.voltage_nplc = self.nplc
+        elif self.measurement_mode == 'current':
+            self.device.current_nplc = self.nplc
+        else:
+            raise BadConfigError(f"(Voltmeter) {self.measurement_mode} is not supported by this script.")
+        self.device.mode = self.measurement_mode
+
+    def measure_voltage(self):
+        if self.measurement_mode != 'voltage':
+            self.setupManager.log_warning(f"(Voltmeter) Cannot measure voltage when in {self.measurement_mode} mode.")
+            return None
+        else:
+            self.device.measure_voltage(max_voltage=10)
+            return self.device.voltage
+    
+    def measure_current(self):
+        if self.measurement_mode != "current":
+            self.setupManager.log_warning(f"(Voltmeter) Cannot measure current when in {self.measurement_mode} mode.")
+            return None
+        else:
+            self.device.measure_current()
+            return self.device.current
+        
+    def shutdown(self):
+        self.device.shutdown()
+            
 
 class NIDAQ_channel():
     """
@@ -207,13 +266,15 @@ class NIDAQ_channel():
                  id: int,
                  setupManager: SetupManager,
                  activation_module: str,
-                 readout_module: str) -> None:
+                 readout_module: str,
+                 config_id: str = "nidaq") -> None:
+        self.config_id = config_id
         self.setupManager: SetupManager = setupManager
         self.id: int = id
         self.activation_module: str = activation_module
         self.readout_module: str = readout_module
-        self.sample_frequency = self.setupManager.get_setup_config()['nidaq']['sample_frequency']
-        self.averaging = self.setupManager.get_setup_config()['nidaq']['samples_per_measurement'] 
+        self.sample_frequency = self.setupManager.get_setup_config()[config_id]['sample_frequency']
+        self.averaging = self.setupManager.get_setup_config()[config_id]['samples_per_measurement'] 
         self.min_voltage = self.setupManager.get_voltage_range()[0]
         self.max_voltage = self.setupManager.get_voltage_range()[1]
         self.current_amplification = self.setupManager.get_setup_config()['amplification']
@@ -271,7 +332,7 @@ class NIDAQ_channel():
     def ramp_to_voltage(self, target_voltage: float):
         voltages = np.linspace(start=self.voltage,
                             stop=target_voltage,
-                            num=self.setupManager.get_setup_config()['nidaq']['ramp_points']) 
+                            num=self.setupManager.get_setup_config()[self.config_id]['ramp_points']) 
         try:
             with nidaqmx.Task() as task:
                 task.ao_channels.add_ao_voltage_chan(
@@ -308,9 +369,9 @@ class NIDAQ_chassis():
         system (System): Class representing the NIDAQ_chassis.
     """
 
-    def __init__(self, setupManager: SetupManager) -> None:
+    def __init__(self, setupManager: SetupManager, config_id: str = "nidaq") -> None:
         self.setupManager = setupManager
-        self.config = self.setupManager.get_setup_config()['nidaq'] 
+        self.config = self.setupManager.get_setup_config()[config_id] 
         self.activation_channels: Dict[int, NIDAQ_channel] = {}
         self.readout_channels: Dict[int, NIDAQ_channel] = {}
         self.activation_voltages: Dict[int, float] = {}

@@ -1,5 +1,5 @@
 from setupmanager import SetupManager
-from instruments import SMU, NIDAQ_chassis
+from instruments import SMU, NIDAQ_chassis, Voltmeter
 
 import numpy as np
 from typing import List, Dict
@@ -173,3 +173,30 @@ class IV_SMU_NIDAQ(Experiment):
     def shutdown(self):
         self.smu.shutdown()
         self.nidaq.shutdown()
+
+class TEST_VOLTMETER(Experiment):
+
+    def __init__(self, setupManager: SetupManager) -> None:
+        self.setupManager: SetupManager = setupManager
+        self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
+        self.voltmeter: Voltmeter = Voltmeter(setupManager)
+        atexit.register(self.shutdown)
+
+    def run(self):
+
+        voltages_output = []
+        voltages_input = self.setupManager.get_input_data()
+        self.nidaq.start_active_all_channels()
+
+        for index, input_voltage in enumerate(voltages_input):
+            self.nidaq.set_voltage(7, input_voltage)
+            voltage_measured = self.voltmeter.measure_voltage()
+            voltages_output.append(voltage_measured)
+            self.setupManager.log_info(f"Set: {input_voltage:.2g}V, Measured: {voltage_measured:.2g}V \t| ({index+1}/{len(voltages_input)})")
+
+        self.setupManager.write_data_to_file("voltages_input.csv", voltages_input)
+        self.setupManager.write_data_to_file("voltages_output.csv", voltages_output)
+
+    def shutdown(self):
+        self.nidaq.shutdown()
+        self.voltmeter.shutdown()
