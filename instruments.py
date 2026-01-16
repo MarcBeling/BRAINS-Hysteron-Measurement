@@ -79,10 +79,7 @@ class SMU():
         """
         self.device.measure_voltage()
         voltage = self.device.voltage
-        if voltage != None:
-            return voltage #type: ignore
-        else:
-            raise NoMeasurementError("SMU")
+        return voltage #type: ignore
 
     def measure_current(self) -> float:
         """
@@ -94,10 +91,7 @@ class SMU():
         """
         self.device.measure_current()
         current = self.device.current
-        if current != None:
-            return current # type: ignore
-        else:
-            raise NoMeasurementError("SMU")
+        return current # type: ignore
 
 
     def set_voltage(self, voltage: float):

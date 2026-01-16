@@ -13,11 +13,11 @@
             "program": "${workspaceFolder}/plotter.py",
             "console": "integratedTerminal",
             "args": [
-                "voltage_ei.csv",
+                "voltages_ei.csv",
                 "currents_eo.csv",
-                "IV_RNPU_3T-2026-01-05_11-25-57",
+                "IV_RNPU_3T_FLOAT_TEST-2026-01-08_15-16-02",
                 "IV",
-                "IV Plot e_i -> e_o: 3 Terminal RNPU with 300mV Control Voltages."
+                "IV Plot of 3T RNPU - TEST"
             ]
         },
         {   "name": "Plot VI",
@@ -28,9 +28,9 @@
             "args": [
                 "currents_ei.csv",
                 "voltages_ei.csv",
-                "VI_RNPU_3T-2026-01-05_11-37-11",
+                "VI_RNPU_3T_FLOAT-2026-01-08_14-37-37",
                 "VI",
-                "VI Plot e_i -> e_o: 3 Terminal RNPU with 300mV Control Voltages."
+                "VI Plot of 2T+1Floating RNPU"
             ]
         },
         {   "name": "Experiment",

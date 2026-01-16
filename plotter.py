@@ -17,22 +17,36 @@ def plot(xdata_name, ydata_name, folder_name='', type="IV", title=""):
         ydata = ydata / (2 * 10**6)
         ydata = ydata * 1e9  # A -> nA
 
-        ax.set_xlabel("Voltage in V")
-        ax.set_ylabel("Current in nA")
+        ax.set_xlabel("Voltage in V applied at $e_i$")
+        ax.set_ylabel("Current in nA measured at $e_o$")
+
+        ax.set_xticks(np.arange(-1.5, 2.0, 0.5))
 
         ax.axvline(0, color='k', alpha=0.4)
-        ax.set_xticks(np.arange(-1.5, 1.5, 0.5))
+        ax.axhline(0, color='k', alpha=0.4)
+        #ax.axhline(0, color='k', alpha=0.4)
+        #ax.axhspan(-50, -40, color='lightblue', alpha=0.3, label="Hysterisis effect")
+        ax.plot(xdata, ydata, label="IV Curve RNPU @ -300mV")
+        ax.set_title(title)
+        ax.tick_params(direction='in')
+        ax.grid(True)
+        ax.legend()
+        fig.tight_layout()
 
     elif type == "VI":
-        
-        ax.set_xlabel("Current in nA")
-        ax.set_ylabel("Voltage in V")
+        xdata = xdata * 1e9
+        ax.set_xlabel("Current in nA applied at $e_i$")
+        ax.set_ylabel("Voltage in V measured at $e_i \\rightarrow$GND")
 
-    ax.plot(xdata, ydata)
-    ax.set_title(title)
-    ax.tick_params(direction='in')
-    ax.grid(True)
-    fig.tight_layout()
+        ax.axvline(0, color='k', alpha=0.4)
+        ax.axhline(0, color='k', alpha=0.4)
+        #ax.axvspan(-50, -40, color='lightblue', alpha=0.3, label="Hysterisis effect")
+        ax.plot(xdata, ydata, label="VI Curve RNPU @ 0mV")
+        ax.set_title(title)
+        ax.tick_params(direction='in')
+        ax.grid(True)
+        ax.legend()
+        fig.tight_layout()
     plt.show()
 
 if __name__ == "__main__":
