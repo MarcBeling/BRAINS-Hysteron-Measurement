@@ -184,6 +184,7 @@ class SMU():
         self.device.shutdown()
         self.setupManager.log_info("SMU shutdown.")
 
+
 class Voltmeter():
     def __init__(self, setupManager: SetupManager, config_id: str = "voltmeter") -> None:
         self.setupManager = setupManager
@@ -205,6 +206,7 @@ class Voltmeter():
         device: Union[Keithley2000, None] = None
         try:
             device = Keithley2000(self.device_id, timeout=self.timeout)
+            self.setupManager.log_info(device.name)
         except Exception as e:
             self.setupManager.log_warning(f"Failed to load GPIB library. Continuing without GPIB support.") 
         if device == None:
@@ -242,6 +244,7 @@ class Voltmeter():
         
     def shutdown(self):
         self.device.shutdown()
+        self.setupManager.log_info("(Voltmeter) Shutdown.")
             
 
 class NIDAQ_channel():

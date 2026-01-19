@@ -6,6 +6,8 @@ from typing import List, Dict
 from abc import ABC, abstractmethod
 import atexit
 import time
+
+
 class Experiment(ABC):
     """
     Abstract class to unifying Experiment implementation.
@@ -199,4 +201,49 @@ class TEST_VOLTMETER(Experiment):
 
     def shutdown(self):
         self.nidaq.shutdown()
+        self.voltmeter.shutdown()
+
+class IV_SMU_NI_VOLT(Experiment):
+
+    def __init__(self, setupManager: SetupManager) -> None:
+        super().__init__()
+        self.setupManager: SetupManager = setupManager
+        self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
+        self.voltmeter: Voltmeter = Voltmeter(setupManager)
+        self.smu: SMU = SMU(setupManager)
+        atexit.register(self.shutdown)
+
+    def run(self):
+
+        voltages_ei = self.setupManager.get_input_data()
+        currents_eo = []
+        currents_ec = [] 
+        currents_ei = []
+
+        self.nidaq.start_active_all_channels()
+
+        for index, input_voltage in enumerate(voltages_ei):
+            
+            self.smu.set_voltage(input_voltage)
+            current_ei = self.smu.measure_current()
+
+            self.setupManager.log_info(f"Voltage @ {input_voltage:.2g}V & {current_ei}A |\t{index+1}/{len(voltages_ei)}")
+
+            if index >= 60 and index < (len(voltages_ei) - 60):
+
+                current_eo = self.voltmeter.measure_current()
+                current_ec = self.nidaq.measure_voltage(2)
+
+                currents_eo.append(current_eo)
+                currents_ec.append(current_ec)
+                currents_ei.append(current_ei)
+                
+        self.setupManager.write_data_to_file("voltages_ei.csv", voltages_ei)
+        self.setupManager.write_data_to_file("currents_eo.csv", currents_eo)
+        self.setupManager.write_data_to_file("currents_ec.csv", currents_ec)
+        self.setupManager.write_data_to_file("currents_ei.csv", currents_ec)
+
+    def shutdown(self):
+        self.nidaq.shutdown()
+        self.smu.shutdown()
         self.voltmeter.shutdown()
