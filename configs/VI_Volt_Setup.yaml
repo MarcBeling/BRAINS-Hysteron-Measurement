@@ -27,10 +27,8 @@ smu:
   tolerance_current: 10e-9
   pause_between_set: 0.02
 
-K2000:
-  device_id: 'GPIB0::17::INSTR'
-  timeout: 50000
+K195:
+  device_id: '"GPIB1::11::INSTR"'
   measurement_mode: 'voltage'
-  range: 1
-  trigger_count: 1
-  nplc: 1
+  range: 2
+  timeout: 50000

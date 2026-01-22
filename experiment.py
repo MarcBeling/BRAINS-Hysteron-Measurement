@@ -1,5 +1,5 @@
 from setupmanager import SetupManager
-from equipment import SMU, NIDAQ_chassis, K2000, K195
+from equipment import SMU, NIDAQ_chassis, K195, K195
 
 import numpy as np
 from typing import List, Dict
@@ -212,7 +212,7 @@ class IV_SMU_NI_VOLT(Experiment):
         super().__init__()
         self.setupManager: SetupManager = setupManager
         self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
-        self.voltmeter: K2000 = K2000(setupManager)
+        self.voltmeter: K195 = K195(setupManager)
         self.smu: SMU = SMU(setupManager)
         atexit.register(self.shutdown)
 
@@ -257,7 +257,7 @@ class VI_SMU_NI_VOLT(Experiment):
         super().__init__()
         self.setupManager: SetupManager = setupManager
         self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
-        self.voltmeter: K2000 = K2000(setupManager)
+        self.voltmeter: K195 = K195(setupManager)
         self.smu: SMU = SMU(setupManager)
         atexit.register(self.shutdown)
 
