@@ -1,5 +1,5 @@
 from setupmanager import SetupManager
-from instruments import SMU, NIDAQ_chassis, Voltmeter
+from equipment import SMU, NIDAQ_chassis, K2000, K195
 
 import numpy as np
 from typing import List, Dict
@@ -157,11 +157,11 @@ class IV_SMU_NIDAQ(Experiment):
 
             if index >= 60 and index < (len(voltages_ei) - 60):
 
-                current_eo = self.nidaq.measure_voltage(1)
+                #current_eo = self.nidaq.measure_voltage(1)
                 current_ec = self.nidaq.measure_voltage(2)
                 voltage_SMU_ei = self.smu.measure_voltage()
 
-                currents_eo.append(current_eo)
+                #currents_eo.append(current_eo)
                 currents_ec.append(current_ec)
                 currents_ei.append(current_ei)
                 voltages_SMU_ei.append(voltage_SMU_ei)
@@ -181,7 +181,7 @@ class TEST_VOLTMETER(Experiment):
     def __init__(self, setupManager: SetupManager) -> None:
         self.setupManager: SetupManager = setupManager
         self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
-        self.voltmeter: Voltmeter = Voltmeter(setupManager)
+        self.voltmeter: K195 = K195(setupManager)
         atexit.register(self.shutdown)
 
     def run(self):
@@ -191,6 +191,9 @@ class TEST_VOLTMETER(Experiment):
         self.nidaq.start_active_all_channels()
 
         for index, input_voltage in enumerate(voltages_input):
+            self.nidaq.set_voltage(4, input_voltage)
+            self.nidaq.set_voltage(5, input_voltage)
+            self.nidaq.set_voltage(6, input_voltage)
             self.nidaq.set_voltage(7, input_voltage)
             voltage_measured = self.voltmeter.measure_voltage()
             voltages_output.append(voltage_measured)
@@ -209,7 +212,7 @@ class IV_SMU_NI_VOLT(Experiment):
         super().__init__()
         self.setupManager: SetupManager = setupManager
         self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
-        self.voltmeter: Voltmeter = Voltmeter(setupManager)
+        self.voltmeter: K2000 = K2000(setupManager)
         self.smu: SMU = SMU(setupManager)
         atexit.register(self.shutdown)
 
@@ -247,3 +250,50 @@ class IV_SMU_NI_VOLT(Experiment):
         self.nidaq.shutdown()
         self.smu.shutdown()
         self.voltmeter.shutdown()
+
+class VI_SMU_NI_VOLT(Experiment):
+
+    def __init__(self, setupManager: SetupManager) -> None:
+        super().__init__()
+        self.setupManager: SetupManager = setupManager
+        self.nidaq: NIDAQ_chassis = NIDAQ_chassis(setupManager)
+        self.voltmeter: K2000 = K2000(setupManager)
+        self.smu: SMU = SMU(setupManager)
+        atexit.register(self.shutdown)
+
+    def run(self):
+
+        self.nidaq.start_active_all_channels()
+
+        currents_ei = self.setupManager.get_input_data()
+        currents_ec = []
+        voltages_ei = []
+        voltages_eo = []
+
+        for index, input_current in enumerate(currents_ei):
+
+            self.smu.set_current(input_current)
+
+            voltage_ei = self.smu.measure_voltage()
+
+            if index >= 60 and index < (len(currents_ei)-60):
+
+                current_ec = self.nidaq.measure_voltage(2)
+                voltage_eo = self.voltmeter.measure_voltage()
+
+                currents_ec.append(current_ec)
+                voltages_ei.append(voltage_ei)
+                voltages_eo.append(voltage_eo)
+
+
+            self.setupManager.log_info(f"Current @ {input_current:.2g}A / {voltage_ei:.2g}V \t|{index+1}/{len(currents_ei)}")
+
+        self.setupManager.write_data_to_file("currents_ec.csv", currents_ec)
+        self.setupManager.write_data_to_file("voltages_ei.csv", voltages_ei)
+        self.setupManager.write_data_to_file("voltages_eo.csv", voltages_eo)
+        self.setupManager.write_data_to_file("currents_ei.csv", currents_ei)
+
+
+    def shutdown(self):
+        self.nidaq.shutdown()
+        self.smu.shutdown()

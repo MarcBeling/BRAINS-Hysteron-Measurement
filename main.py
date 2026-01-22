@@ -2,7 +2,7 @@ from configreader import Config
 from pathlib import Path
 from setupmanager import SetupManager
 import experiment as ep
-CONFIG_SETUP = Config(str(Path('configs')/'TEST_VOLTMETER.yaml'))
+CONFIG_SETUP = Config(str(Path('configs')/'TEST_Voltmeter.yaml'))
 
 if __name__=="__main__":
 

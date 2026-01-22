@@ -14,10 +14,10 @@
             "console": "integratedTerminal",
             "args": [
                 "voltages_ei.csv",
-                "currents_eo.csv",
-                "IV_RNPU_3T_FLOAT_TEST-2026-01-08_15-16-02",
+                "currents_ei.csv",
+                "IV_TEST_VOLT_3T-2026-01-19_15-11-20",
                 "IV",
-                "IV Plot of 3T RNPU - TEST"
+                "IV Plot of 3T RNPU - TEST Volt."
             ]
         },
         {   "name": "Plot VI",
@@ -27,8 +27,8 @@
             "console": "integratedTerminal",
             "args": [
                 "currents_ei.csv",
-                "voltages_ei.csv",
-                "VI_RNPU_3T_FLOAT-2026-01-08_14-37-37",
+                "voltages_eo.csv",
+                "VI_TEST_VOLT_3T-2026-01-19_15-16-46",
                 "VI",
                 "VI Plot of 2T+1Floating RNPU"
             ]

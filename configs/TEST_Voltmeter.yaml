@@ -1,8 +1,8 @@
 name: "TEST_VOLTMETER"
-description: "Tests to see if communication to the voltmeter works."
+description: "Tests to see if communication to the voltmeter (K195) works."
 min_value: -2.0
 max_value: 2.0
-data_density: 20
+data_density: 60
 voltage_range: [-2.0, 2.0]
 current_range: [-500e-9, 500e-9]
 amplification: 1
@@ -18,11 +18,12 @@ nidaq:
   readout_channels: [0]
   control_voltages:
     7: 0
+    6: 0
+    5: 0
+    4: 0
 
-voltmeter:
-  device_id: 'GPIB0::17::INSTR'
-  timeout: 50000
+K195:
+  device_id: 11
   measurement_mode: 'voltage'
   range: 10
-  trigger_count: 1
-  nplc: 1
+  timeout: 50000
