@@ -17,12 +17,13 @@ RNPU:
 
 GA:
   num_generations: 20
-  num_parents_mating: 5
-  sol_per_pop: 10
+  num_parents_mating: 10
+  sol_per_pop: 20
   gene_space: {"low": -0.9, "high": 0.9}
   mutation_type: "random"
-  mutation_percent_genes: 10
+  mutation_percent_genes: 25
   mutation_num_genes: 1
+  keep_parents: 1
 
 nidaq:
   activation_module_id: 'cDAQ1Mod1'

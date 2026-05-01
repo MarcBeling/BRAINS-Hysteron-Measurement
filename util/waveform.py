@@ -82,8 +82,8 @@ class Waveform():
         ramp_up = np.linspace(self.min_value, self.max_value, self.data_per_sec)
         ramp_pause = np.linspace(self.max_value, self.max_value, 10)
         ramp_down = np.linspace(self.max_value, self.min_value, self.data_per_sec)
-        ramp_stop = np.linspace(self.min_value, 0, 10)
-        #self._data = np.concatenate((ramp_start, ramp_up, ramp_pause, ramp_down, ramp_stop))
+        # ramp_stop = np.linspace(self.min_value, 0, 10)
+        self._data = np.concatenate((ramp_up, ramp_pause, ramp_down))
 
     def clip_waveform(self, min_value, max_value):
         self._data = np.clip(self._data, min_value, max_value)

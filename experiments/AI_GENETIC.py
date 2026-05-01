@@ -22,15 +22,16 @@ class AI_GENETIC(Experiment):
 
         # Initialize the genetic algorithm from values given in the experiments configuration file.
         self.ga_instance = pygad.GA(
-            num_generations =    self.config['GA']['num_generations'],
-            num_parents_mating = self.config['GA']['num_parents_mating'],
-            fitness_func =       AI_GENETIC.fitness_func,
-            sol_per_pop =        self.config['GA']['sol_per_pop'],
-            num_genes  =         len(self.config['RNPU']['control_electrodes']),
-            gene_space =         self.config['GA']['gene_space'],
-            mutation_type =      self.config['GA']['mutation_type'],
-            mutation_percent_genes = self.config['GA']['mutation_percent_genes'],
-            mutation_num_genes= self.config['GA']['mutation_num_genes']
+            num_generations =       self.config['GA']['num_generations'],
+            num_parents_mating =    self.config['GA']['num_parents_mating'],
+            fitness_func =          AI_GENETIC.fitness_func,
+            sol_per_pop =           self.config['GA']['sol_per_pop'],
+            num_genes  =            len(self.config['RNPU']['control_electrodes']),
+            gene_space =            self.config['GA']['gene_space'],
+            mutation_type =         self.config['GA']['mutation_type'],
+            mutation_percent_genes= self.config['GA']['mutation_percent_genes'],
+            mutation_num_genes =    self.config['GA']['mutation_num_genes'],
+            keep_parents=           self.config["GA"]["keep_parents"]
         )
 
     @staticmethod
@@ -49,7 +50,7 @@ class AI_GENETIC(Experiment):
             float: A value for the fitness for the applied solution.
         """        
         result = HardwareInterface().apply_and_calc_fit(solution, solution_idx)
-        print(f"[Solution {solution_idx}]\nConfiguration {solution}\nFitness: {result}")
+        print(f"[Solution {solution_idx}]\nConfiguration {solution}\nFitness: {result}\n")
         return result # type: ignore
     
 

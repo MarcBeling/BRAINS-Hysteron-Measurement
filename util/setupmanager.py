@@ -162,6 +162,7 @@ class SetupManager(metaclass=Singleton):
         subfolder: Path = self.root_folder / foldername 
         if not os.path.exists(subfolder):
             os.makedirs(subfolder)
+        
 
     def plot_list(self,
                   currents_list: List[float],

@@ -34,7 +34,7 @@ class HardwareInterface(metaclass=Singleton):
         return fittness
     
     def compute_fittness(self, response: Response):
-        return np.sum(np.pow((response.get_up_sweep() - response.get_down_sweep()), 2))
+        return np.sum(np.pow((response.get_up_sweep() - response.get_down_sweep()), 2))*((1.0)/len(response.get_up_sweep()))
     
     def close(self):
         self.smu.shutdown()
@@ -51,6 +51,7 @@ class PhysicalRNPU():
         self.input = self.config['input_electrodes']
         self.control: List = self.config['control_electrodes']
         self.output: str = self.config['output_electrodes']
+        self.counter = 0
 
         self.all_electrodes = []
         self.all_electrodes.append(self.input)
@@ -96,10 +97,11 @@ class PhysicalRNPU():
         for voltage in input_data:
             self.set_input({self.input: voltage})
             current_list.append(self.get_output_current())
-        self.sm.create_subfolder(f"data/solution_{solution_idx}")
-        self.sm.create_subfolder(f"plots/solution_{solution_idx}")
-        self.sm.write_1d_array(f"solution_{solution_idx}/currents_{self.output}.csv",current_list)
-        self.sm.plot_list(current_list, f"/solution_{solution_idx}/")
+        self.sm.create_subfolder(f"data/solution_{self.counter}")
+        self.sm.create_subfolder(f"plots/solution_{self.counter}")
+        self.sm.write_1d_array(f"solution_{self.counter}/currents_{self.output}.csv",current_list)
+        self.sm.plot_list(current_list, f"/solution_{self.counter}/")
+        self.counter = self.counter+1
         return current_list
     
     def get_response(self, solution: Solution, solution_idx: int):
@@ -108,7 +110,7 @@ class PhysicalRNPU():
             result = self.sweep_all(solution_idx)
             return Response(result[self.output])
         else:
-            result = self.sweep(solution_idx)
+            result = list(np.asarray(self.sweep(solution_idx))*1e9)
             return Response(result)
         
     def get_control_electrodes(self):
