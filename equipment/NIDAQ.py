@@ -249,7 +249,7 @@ class NIDAQ_chassis():
         
 
     def set_voltage_configuration(self, control_voltages: Dict[int, float]):
-        voltages = control_voltages.values()
+        voltages = list(control_voltages.values())
         list_activation_channels = control_voltages.keys()
 
         activation_string = ""

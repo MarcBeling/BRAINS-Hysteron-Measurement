@@ -45,6 +45,7 @@ if __name__=="__main__":
     try:
         experiment.run()
         experiment.plot()
+        experiment.close()
         winsound.Beep(100, 1000)
     except KeyboardInterrupt:
         print("Measurement interrupted by user.")

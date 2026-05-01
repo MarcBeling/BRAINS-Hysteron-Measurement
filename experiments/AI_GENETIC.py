@@ -18,6 +18,7 @@ class AI_GENETIC(Experiment):
     def __init__(self) -> None:
         super().__init__()
         self.sm: SetupManager = SetupManager()
+        atexit.register(self.close)
         HardwareInterface()
         self.config = self.sm.get_config()
 
@@ -30,12 +31,12 @@ class AI_GENETIC(Experiment):
             num_genes  =         self.config['GA']['num_genes'],
             gene_space =         self.config['GA']['gene_space'],
             mutation_type =      self.config['GA']['mutation_type'],
-            mutation_percent_genes = self.config['GA']['mutation_percent_genes']
+            mutation_percent_genes = self.config['GA']['mutation_percent_genes'],
+            mutation_num_genes= self.config['GA']['mutation_num_genes']
         )
-        atexit.register(self.close)
 
     @staticmethod
-    def fitness_func(solution: List[float], solution_idx: int) -> float:
+    def fitness_func(ga_instance: pygad.GA, solution: List[float], solution_idx: int) -> float:
         """
         Function to calculate the fitness for a given solution.\n
         Because `pygad` requires a function with two parameters, `solution` and `solution_idx`,
@@ -74,6 +75,9 @@ class AI_GENETIC(Experiment):
         self.ga_instance.run()
         best_solution, best_fitness, best_solution_idx = self.ga_instance.best_solution()[0]
         AI_GENETIC.print_solution(best_solution, best_fitness, best_solution_idx)
+
+    def plot(self) -> None:
+        pass
 
     def close(self):
         """

@@ -34,7 +34,7 @@ class HardwareInterface(metaclass=Singleton):
         return fittness
     
     def compute_fittness(self, response: Response):
-        return np.pow(response.get_up_sweep() - response.get_down_sweep, 2)
+        return np.pow((response.get_up_sweep() - response.get_down_sweep()), 2)
     
     def close(self):
         self.nidaq.shutdown()
@@ -50,7 +50,10 @@ class PhysicalRNPU():
         self.input = self.config['input_electrodes']
         self.control = self.config['control_electrodes']
         self.output: str = self.config['output_electrodes']
-        self.all_electrodes = self.input + self.control + self.output
+        self.all_electrodes = []
+        self.all_electrodes.append(self.input)
+        self.all_electrodes = self.all_electrodes + self.control
+        self.all_electrodes.append(self.output)
         self.cv_dict: Dict[int, float] = dict.fromkeys(self.control, 0)
 
     def set_control_voltage_configuration(self, control_voltages: Dict[int, float]):
@@ -61,8 +64,8 @@ class PhysicalRNPU():
         self.nidaq.set_voltage_configuration(input_values)
 
     def get_output_current_all(self, include_smu: bool = True):
-        currents_out = self.nidaq.get_currents_bulk(self.control.append(self.input))
-        currents_out = {str(key): value for key, value in currents_out.items()}
+        currents_out = self.nidaq.get_currents_bulk(list(self.nidaq.readout_channels.keys()))
+        currents_out = {key: value for key, value in currents_out.items()}
         if include_smu:
             currents_out[self.output] = self.smu.measure_current()
         return currents_out
@@ -77,7 +80,7 @@ class PhysicalRNPU():
             self.set_input({self.input: voltage})
             result = self.get_output_current_all()
             for key in result.keys():
-                current_dict[str(key)].append(result[key])
+                current_dict[key].append(result[key])
         self.sm.create_subfolder(f"data/solution_{solution_idx}")
         self.sm.create_subfolder(f"plots/solution_{solution_idx}")
         self.sm.write_dict(f"solution_{solution_idx}/currents", current_dict)

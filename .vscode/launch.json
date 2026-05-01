@@ -67,6 +67,18 @@
             "justMyCode": false
         },
         {
+            "name": "AI_GENETIC",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "AI_GENETIC"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "IV_NI_SMU_REVERSE",
             "type": "debugpy",
             "request": "launch",

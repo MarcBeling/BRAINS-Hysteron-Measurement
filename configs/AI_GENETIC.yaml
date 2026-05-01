@@ -7,21 +7,23 @@ data_density: 21
 voltage_range: [-1.5, 1.5]
 current_range: [-300e-9, 300e-9]
 amplification: 1
-waveform: 'REZA'
-sweep_all: False
+wavetype: 'SWEEP'
+
 RNPU:
-  input_electrodes: [0]
-  control_electrodes: [3, 4]
+  input_electrodes: 7
+  control_electrodes: [2, 4]
   output_electrodes: "IV"
+  sweep_all: True
 
 GA:
   num_generations: 20
   num_parents_mating: 5
   sol_per_pop: 10
   num_genes: 4
-  gene_space: {"low": -1, "high": 1, "dtype": float}
+  gene_space: {"low": -1, "high": 1}
   mutation_type: "random"
   mutation_percent_genes: 10
+  mutation_num_genes: 1
 
 nidaq:
   activation_module_id: 'cDAQ1Mod1'
@@ -33,8 +35,8 @@ nidaq:
   readout_channels: [7, 2, 4] #0-7
   control_voltages:
     7: 0
-    2: -0.2
-    4: 1.0
+    2: 0
+    4: 0
 
 K2400:
   device_id: 'GPIB16::15::INSTR'
