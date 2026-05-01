@@ -1,0 +1,35 @@
+name: "IV_RNPU_1000mV_Reversed_1500k"
+description: "IV Curve for RNPU to validate theory with 1.5MOhm Resistor."
+device_measured: "RNPU"
+min_value: -1.5
+max_value: 1.5
+data_density: 60
+voltage_range: [-4, 4]
+current_range: [-400e-9, 400e-9]
+amplification: 1
+waveform: 'REZA'
+input_pad: 7
+output_pad: "IV"
+CV1_pad: 2
+CV2_pad: 4
+
+nidaq:
+  activation_module_id: 'cDAQ1Mod1'
+  readout_module_id: 'cDAQ1Mod2'
+  sample_frequency: 10000.0
+  update_frequency: 5000.0
+  ramp_points: 3000
+  samples_per_measurement: 5
+  readout_channels: [2, 4, 7] #0-7
+  control_voltages:
+    2: -0.2
+    4: 1
+    7: 0
+
+K2400:
+  device_id: 'GPIB16::15::INSTR'
+  timeout: 50000
+  drive_mode: 'VOLTAGE_DRIVEN'
+  tolerance_voltage: 0.01
+  tolerance_current: 10e-9
+  pause_between_set: 0.02

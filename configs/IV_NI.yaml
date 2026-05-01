@@ -1,0 +1,22 @@
+name: "IV_BOX_CHECK"
+description: "IV Curve for RNPU to validate device."
+device_measured: "RNPU"
+min_value: -1.5
+max_value: 1.5
+data_density: 61
+voltage_range: [-1.6, 1.6]
+current_range: [-400e-9, 400e-9]
+amplification: 1
+waveform: 'REZA'
+input_pad: 0
+
+nidaq:
+  activation_module_id: 'cDAQ1Mod1'
+  readout_module_id: 'cDAQ1Mod2'
+  sample_frequency: 4000.0
+  update_frequency: 1000.0
+  ramp_points: 3000
+  samples_per_measurement: 5
+  readout_channels: [0, 1, 2, 3, 4, 5, 6, 7] #0-7
+  control_voltages:
+    0: 0

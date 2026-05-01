@@ -1,0 +1,39 @@
+name: "IV_RNPU_-600mV"
+description: "Control Voltage runs of voltage measuremed in 4T setup. -600mV Control voltage, WITH Voltage Follower. Switched Voltmeter to K2400"
+device_measured: "RNPU"
+min_value: -1.5
+max_value: 1.5
+data_density: 60
+voltage_range: [-1.5, 1.5]
+current_range: [-400e-9, 400e-9]
+waveform: 'REZA'
+input_pad: "IV"
+control_pad: 4
+output_pad: 7
+voltmeter_pad: "VVII"
+
+nidaq:
+  activation_module_id: 'cDAQ1Mod1'
+  readout_module_id: 'cDAQ1Mod2'
+  sample_frequency: 4000.0
+  update_frequency: 1000.0
+  ramp_points: 5000
+  samples_per_measurement: 5
+  readout_channels: [4, 7] # 0-15
+  control_voltages:
+    4: -0.6
+
+K2400:
+  device_id: 'GPIB16::15::INSTR'
+  timeout: 50000
+  drive_mode: 'VOLTAGE_DRIVEN'
+  tolerance_voltage: 0.01
+  tolerance_current: 10e-9
+  pause_between_set: 0.02
+
+HP34401A:
+  device_id: 'GPIB1::16::INSTR'
+  trigger_count: 50
+  nplc: 0.02
+  range: "AUTO"
+  timeout: 5000

@@ -1,55 +1,168 @@
 {
     "version": "0.2.0",
     "configurations": [
-        {   "name": "Current File",
+        {
+            "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
         },
-        {   "name": "Plot IV",
+        {
+            "name": "PLOT_VV",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/plotter.py",
-            "console": "integratedTerminal",
-            "args": [
-                "voltages_ei.csv",
-                "currents_eo.csv",
-                "IV_SMU_SMU_NIDAQC_NRNPU-2026-02-02_11-28-34",
-                "IV",
-                "IV Plot of 3T RNPU"
-            ]
+            "program": "${workspaceFolder}/plotters/VVPlot/vvplot.py",
+            "console": "integratedTerminal"
         },
-        {   "name": "Plot VI",
+        {
+            "name": "PLOT_VI",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/plotter.py",
-            "console": "integratedTerminal",
-            "args": [
-                "currents_ei.csv",
-                "voltages_eo.csv",
-                "VI_SMU_SMU_NIDAQC_NRNPU-2026-02-02_11-40-27",
-                "VI",
-                "VI Plot of 3T RNPU"
-            ]
+            "program": "${workspaceFolder}/plotters/VIPlot/viplot.py",
+            "console": "integratedTerminal"
         },
-        {   "name": "Plot 1-1",
+        {
+            "name": "PLOT_IV_ALL",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/plotter.py",
-            "console": "integratedTerminal",
-            "args": [
-                "voltages_ei.csv",
-                "currents_ei.csv",
-                "IV_SMU_SMU_NIDAQC-2026-02-02_10-33-40",
-                "1-1",
-                "IV Plot"
-            ]
+            "program": "${workspaceFolder}/plotters/IVALLPlot/iv_to_iv.py",
+            "console": "integratedTerminal"
         },
-        {   "name": "Experiment",
+        {
+            "name": "PLOT_VIIV",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/main.py",
+            "program": "${workspaceFolder}/plotters/VIIVPlot/viivplot.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "PLOT_IVIV",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/plotters/IVIVPlot/ivivplot.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "IV_NI",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "IV_NI"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "AI_JAN",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "AI_JAN"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "IV_NI_SMU_REVERSE",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "IV_NI_SMU_REVERSE"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "IV_MARTIN",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "IV_MARTIN"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "IV_MARTIN_SMU",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "IV_MARTIN_SMU"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "IV_PULL_PUSH",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "IV_PULL_PUSH"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "IV_DYNAMIC",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "IV_DYNAMIC"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "IV_NI_SMU",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "IV_NI_SMU"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "IV_MATRIX",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "IV_MATRIX"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "VI_HYST",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "VI_HYST"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "IV_HYST",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "IV_HYST"
+            ],
+            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
         }
     ]

@@ -1,0 +1,13 @@
+ === [META INFORMATION - 2026-04-30 17:08:03.659565] === 
+processor_type: simulation
+waveform:
+	plateau_length: 30
+	slope_length: 30
+input_electrodes: [[1]]
+min_value: -1.5
+max_value: 1.5
+data_density: 61
+voltage_range: [-1.6, 1.6]
+current_range: ['-400e-9', '400e-9']
+amplification: 1
+wavetype: LINSPACE

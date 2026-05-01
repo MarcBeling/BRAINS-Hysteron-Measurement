@@ -1,0 +1,10 @@
+ === [META INFORMATION - 2026-04-30 16:53:28.895824] === 
+processor_type: simulation
+waveform: REZA
+input_electrodes: [[1, 2]]
+min_value: -1.5
+max_value: 1.5
+data_density: 61
+voltage_range: [-1.6, 1.6]
+current_range: ['-400e-9', '400e-9']
+amplification: 1

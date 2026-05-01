@@ -1,0 +1,45 @@
+name: "AI_GENETIC"
+description: "Using genetic algorithm to get a voltage configuration for RNPU + Resistor"
+device_measured: "RNPU + Resistor"
+min_value: -1.4
+max_value: 1.4
+data_density: 21
+voltage_range: [-1.5, 1.5]
+current_range: [-300e-9, 300e-9]
+amplification: 1
+waveform: 'REZA'
+sweep_all: False
+RNPU:
+  input_electrodes: [0]
+  control_electrodes: [3, 4]
+  output_electrodes: "IV"
+
+GA:
+  num_generations: 20
+  num_parents_mating: 5
+  sol_per_pop: 10
+  num_genes: 4
+  gene_space: {"low": -1, "high": 1, "dtype": float}
+  mutation_type: "random"
+  mutation_percent_genes: 10
+
+nidaq:
+  activation_module_id: 'cDAQ1Mod1'
+  readout_module_id: 'cDAQ1Mod2'
+  sample_frequency: 10000.0
+  update_frequency: 10000.0
+  ramp_points: 1000
+  samples_per_measurement: 5
+  readout_channels: [7, 2, 4] #0-7
+  control_voltages:
+    7: 0
+    2: -0.2
+    4: 1.0
+
+K2400:
+  device_id: 'GPIB16::15::INSTR'
+  timeout: 50000
+  drive_mode: 'VOLTAGE_DRIVEN'
+  tolerance_voltage: 0.01
+  tolerance_current: 10e-9
+  pause_between_set: 0.02
