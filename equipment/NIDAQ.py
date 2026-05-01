@@ -177,7 +177,7 @@ class NIDAQ_chassis():
                 self.setupManager.log_info(f"(NIDAQ Channel {channel}) Voltage {voltage}V applied.")
                 self.activation_channels[channel].ramp_to_voltage(voltage)
 
-    def set_voltage(self, id: int, target_voltage, ramp: bool = False, verbose: bool = False):
+    def set_voltage(self, id: int, target_voltage: float, ramp: bool = False, verbose: bool = False):
         if ramp:
             self.activation_channels[id].ramp_to_voltage(target_voltage)
         else:

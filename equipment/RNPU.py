@@ -34,11 +34,12 @@ class HardwareInterface(metaclass=Singleton):
         return fittness
     
     def compute_fittness(self, response: Response):
-        return np.pow((response.get_up_sweep() - response.get_down_sweep()), 2)
+        return np.sum(np.pow((response.get_up_sweep() - response.get_down_sweep()), 2))
     
     def close(self):
-        self.nidaq.shutdown()
         self.smu.shutdown()
+        self.nidaq.shutdown()
+
 
 class PhysicalRNPU():
 
@@ -48,7 +49,7 @@ class PhysicalRNPU():
         self.nidaq = nidaq
         self.smu = smu
         self.input = self.config['input_electrodes']
-        self.control = self.config['control_electrodes']
+        self.control: List = self.config['control_electrodes']
         self.output: str = self.config['output_electrodes']
         self.all_electrodes = []
         self.all_electrodes.append(self.input)
@@ -61,13 +62,13 @@ class PhysicalRNPU():
         self.nidaq.set_voltage_configuration(control_voltages)
 
     def set_input(self, input_values: Dict[int, float]):
-        self.nidaq.set_voltage_configuration(input_values)
+        self.nidaq.set_voltage(list(input_values.keys())[0], list(input_values.values())[0])
 
     def get_output_current_all(self, include_smu: bool = True):
         currents_out = self.nidaq.get_currents_bulk(list(self.nidaq.readout_channels.keys()))
         currents_out = {key: value for key, value in currents_out.items()}
         if include_smu:
-            currents_out[self.output] = self.smu.measure_current()
+            currents_out[self.output] = self.smu.measure_current() # type: ignore
         return currents_out
     
     def get_output_current(self):

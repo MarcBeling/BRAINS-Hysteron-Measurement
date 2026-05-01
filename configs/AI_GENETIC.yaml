@@ -19,7 +19,7 @@ GA:
   num_generations: 20
   num_parents_mating: 5
   sol_per_pop: 10
-  num_genes: 4
+  num_genes: 2
   gene_space: {"low": -1, "high": 1}
   mutation_type: "random"
   mutation_percent_genes: 10

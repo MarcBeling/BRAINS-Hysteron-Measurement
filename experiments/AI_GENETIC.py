@@ -18,8 +18,7 @@ class AI_GENETIC(Experiment):
     def __init__(self) -> None:
         super().__init__()
         self.sm: SetupManager = SetupManager()
-        atexit.register(self.close)
-        HardwareInterface()
+        self.hardware_interface = HardwareInterface()
         self.config = self.sm.get_config()
 
         # Initialize the genetic algorithm from values given in the experiments configuration file.
@@ -52,7 +51,7 @@ class AI_GENETIC(Experiment):
         """        
         result = HardwareInterface().apply_and_calc_fit(solution, solution_idx)
         print(f"Solution {solution_idx} | Configuration {solution}, Fitness: {result}")
-        return result
+        return result # type: ignore
     
 
     @staticmethod
@@ -83,6 +82,6 @@ class AI_GENETIC(Experiment):
         """
         Shutsdown all measurement equipment and turns all control voltages slowly to 0.
         """        
-        HardwareInterface().close()
+        self.hardware_interface.close()
 
 
