@@ -13,7 +13,7 @@ RNPU:
   input_electrodes: 7
   control_electrodes: [2, 4]
   output_electrodes: "IV"
-  sweep_all: True
+  sweep_all: False
 
 GA:
   num_generations: 20

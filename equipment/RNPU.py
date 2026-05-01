@@ -98,8 +98,8 @@ class PhysicalRNPU():
             current_list.append(self.get_output_current())
         self.sm.create_subfolder(f"data/solution_{solution_idx}")
         self.sm.create_subfolder(f"plots/solution_{solution_idx}")
-        self.sm.write_1d_array(f"solution_{solution_idx}",current_list)
-        self.sm.plot_list(current_list, f"solution_{solution_idx}")
+        self.sm.write_1d_array(f"solution_{solution_idx}/currents_{self.output}.csv",current_list)
+        self.sm.plot_list(current_list, f"/solution_{solution_idx}/")
         return current_list
     
     def get_response(self, solution: Solution, solution_idx: int):
