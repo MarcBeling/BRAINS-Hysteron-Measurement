@@ -1,6 +1,6 @@
 name: "AI_GENETIC"
-description: "Using genetic algorithm to get a voltage configuration for RNPU + Resistor"
-device_measured: "RNPU + Resistor"
+description: "Using genetic algorithm to get a voltage configuration for RNPU hysteresis effect."
+device_measured: "RNPU"
 min_value: -1.4
 max_value: 1.4
 data_density: 21
@@ -11,7 +11,7 @@ wavetype: 'SWEEP'
 
 RNPU:
   input_electrodes: 7
-  control_electrodes: [2, 4]
+  control_electrodes: [0, 1, 2, 4, 5, 6, 7]
   output_electrodes: "IV"
   sweep_all: False
 
@@ -19,8 +19,7 @@ GA:
   num_generations: 20
   num_parents_mating: 5
   sol_per_pop: 10
-  num_genes: 2
-  gene_space: {"low": -1, "high": 1}
+  gene_space: {"low": -0.9, "high": 0.9}
   mutation_type: "random"
   mutation_percent_genes: 10
   mutation_num_genes: 1
@@ -32,11 +31,15 @@ nidaq:
   update_frequency: 10000.0
   ramp_points: 1000
   samples_per_measurement: 5
-  readout_channels: [7, 2, 4] #0-7
+  readout_channels: [0, 1, 2, 4, 5, 6, 7] #0-7
   control_voltages:
-    7: 0
+    0: 0
+    1: 0
     2: 0
     4: 0
+    5: 0
+    6: 0
+    7: 0
 
 K2400:
   device_id: 'GPIB16::15::INSTR'

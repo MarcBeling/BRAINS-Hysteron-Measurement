@@ -26,7 +26,7 @@ class AI_GENETIC(Experiment):
             num_parents_mating = self.config['GA']['num_parents_mating'],
             fitness_func =       AI_GENETIC.fitness_func,
             sol_per_pop =        self.config['GA']['sol_per_pop'],
-            num_genes  =         self.config['GA']['num_genes'],
+            num_genes  =         len(self.config['RNPU']['control_electrodes']),
             gene_space =         self.config['GA']['gene_space'],
             mutation_type =      self.config['GA']['mutation_type'],
             mutation_percent_genes = self.config['GA']['mutation_percent_genes'],
