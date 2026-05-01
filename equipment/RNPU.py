@@ -51,10 +51,12 @@ class PhysicalRNPU():
         self.input = self.config['input_electrodes']
         self.control: List = self.config['control_electrodes']
         self.output: str = self.config['output_electrodes']
+
         self.all_electrodes = []
         self.all_electrodes.append(self.input)
         self.all_electrodes = self.all_electrodes + self.control
         self.all_electrodes.append(self.output)
+
         self.cv_dict: Dict[int, float] = dict.fromkeys(self.control, 0)
 
     def set_control_voltage_configuration(self, control_voltages: Dict[int, float]):
@@ -85,7 +87,7 @@ class PhysicalRNPU():
         self.sm.create_subfolder(f"data/solution_{solution_idx}")
         self.sm.create_subfolder(f"plots/solution_{solution_idx}")
         self.sm.write_dict(f"solution_{solution_idx}/currents", current_dict)
-        self.sm.plot_dict(current_dict, f"/solution_{solution_idx}")
+        self.sm.plot_dict(current_dict, f"/solution_{solution_idx}/")
         return current_dict
             
     def sweep(self, solution_idx: int):

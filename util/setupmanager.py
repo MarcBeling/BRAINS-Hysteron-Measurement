@@ -255,7 +255,7 @@ class SetupManager(metaclass=Singleton):
 
         # ---- Save full grid ----
         fig.tight_layout()
-        fig.savefig(f"{self.save_name}/plots/all_iv_plots_grid.png", dpi=300)
+        fig.savefig(f"{self.save_name}/plots{foldername}all_iv_plots_grid.png", dpi=300)
         plt.close(fig)
 
         self.log_info("Saved: RAW_all_iv_plots_grid.png and RAW_iv_plot_pad_{pad}.png files.")        
