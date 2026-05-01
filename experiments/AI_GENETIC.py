@@ -5,7 +5,6 @@ from util.setupmanager import SetupManager
 from typing import List
 
 import pygad
-import atexit
 
 
 class AI_GENETIC(Experiment):
@@ -50,7 +49,7 @@ class AI_GENETIC(Experiment):
             float: A value for the fitness for the applied solution.
         """        
         result = HardwareInterface().apply_and_calc_fit(solution, solution_idx)
-        print(f"Solution {solution_idx} | Configuration {solution}, Fitness: {result}")
+        print(f"Solution {solution_idx} | Configuration {solution}\tFitness: {result}")
         return result # type: ignore
     
 

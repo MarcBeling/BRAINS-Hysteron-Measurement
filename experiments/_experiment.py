@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from util.setupmanager import SetupManager
-
 class Experiment(ABC):
     """
     Abstract class to unifying Experiment implementation.

@@ -59,7 +59,7 @@ class K2400():
         self.device.enable_source()
         self.device.current_nplc = 1
         self.device.voltage_nplc = 1
-        self.device.source_delay = 0.05
+        self.device.source_delay = 0.00
         self.device.trigger_count = 1
 
 
