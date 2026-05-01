@@ -2,7 +2,7 @@ name: "TEST_VOLTMETER"
 description: "Tests to see if communication to the voltmeter (K195) works."
 min_value: -2.0
 max_value: 2.0
-data_density: 60
+data_density: 25
 voltage_range: [-2.0, 2.0]
 current_range: [-500e-9, 500e-9]
 amplification: 1

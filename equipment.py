@@ -11,6 +11,7 @@ from nidaqmx.errors import DaqError
 from nidaqmx.system import System
 
 from pymeasure.instruments.keithley import Keithley2400, Keithley2000
+from pymeasure.instruments.hp.hp34401A import HP34401A #type: ignore
 from abc import ABC, abstractmethod
 
 import instruments as ik
@@ -284,7 +285,9 @@ class K195(Voltmeter):
             self.setupManager.log_warning(f"(K195) Cannot measure current when in {self.measurement_mode} mode.")
             return None
         else:
-            return self.device.measure(mode=self.device.Mode.current_dc)
+            self.device.assert_trigger()
+            current = float(self.device.read())
+            return current
         
     def shutdown(self):
         self.setupManager.log_info("(K195) Shutdown.")
@@ -579,3 +582,57 @@ class NIDAQ_chassis():
         for channel in self.activation_channels.values():
             channel.shutdown()
 
+class HP34401A(Voltmeter):
+
+    def __init__(self, setupManager: SetupManager, config_id: str = "HP34401A") -> None:
+        self.setupManager = setupManager
+        self.config = self.setupManager.get_setup_config()[config_id]
+        self._read_config()
+        self.device: HP34401A = self._get_device()
+        self._configure_device()
+
+    def _read_config(self):
+        self.device_id = self.config['device_id']
+        self.timeout = self.config['timeout']
+        self.measurement_mode = self.config['measurement_mode']
+        self.range = self.config["range"]
+        self.trigger_count = self.config["trigger_count"]
+        self.nplc = self.config['nplc']
+
+    def _get_device(self) -> HP34401A:
+        device: Union[HP34401A, None] = None
+        try:
+            device = HP34401A(self.device_id)
+            self.setupManager.log_info(device.device_id)
+        except Exception as e:
+            self.setupManager.log_warning(f"Failed to load GPIB library. Continuing without GPIB support.") 
+        if device == None:
+            self.setupManager.log_error('Could not locate a voltmeter device.') 
+            raise DeviceNotFoundError('Voltmeter')
+        return device
+    
+    def _configure_device(self):
+        self.device.range = self.range
+        self.device.trigger_count = self.trigger_count
+        self.device.nplc = self.nplc
+        self.device.measurement_mode = self.measurement_mode
+
+    def measure_voltage(self):
+        if self.measurement_mode != 'voltage':
+            self.setupManager.log_warning(f"(Voltmeter) Cannot measure voltage when in {self.measurement_mode} mode.")
+            return None
+        else:
+            voltage = self.device.measure_voltage()
+            return voltage
+    
+    def measure_current(self):
+        if self.measurement_mode != "current":
+            self.setupManager.log_warning(f"(Voltmeter) Cannot measure current when in {self.measurement_mode} mode.")
+            return None
+        else:
+            current = self.device.measure_current()
+            return current
+        
+    def shutdown(self):
+        self.device.shutdown()
+        self.setupManager.log_info("(Voltmeter) Shutdown.")    

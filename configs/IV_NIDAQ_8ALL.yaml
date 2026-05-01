@@ -1,0 +1,27 @@
+name: "IV_JONAS_T0_2TOnly"
+description: "IV Measurement with NIDAQ module, measuring all 8 terminals currents when voltage is applied to a singular electrode. Only four terminals are connected: 0, 4"
+min_value: -1.5
+max_value: 1.5
+data_density: 120
+voltage_range: [-2, 2]
+current_range: [-400e-9, 400e-9]
+amplification: 6
+waveform: 'REZA'
+
+nidaq:
+  activation_module_id: 'cDAQ1Mod1'
+  readout_module_id: 'cDAQ1Mod2'
+  sample_frequency: 4000.0
+  update_frequency: 1000.0
+  ramp_points: 5000
+  samples_per_measurement: 5
+  readout_channels: [0, 1, 2, 3, 4, 5, 6, 7] # 0-7
+  control_voltages:
+    0: 0
+    1: 0
+    2: 0
+    3: 0
+    4: 0
+    5: 0
+    6: 0
+    7: 0

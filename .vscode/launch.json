@@ -14,10 +14,10 @@
             "console": "integratedTerminal",
             "args": [
                 "voltages_ei.csv",
-                "currents_ei.csv",
-                "IV_TEST_VOLT_3T-2026-01-19_15-11-20",
+                "currents_eo.csv",
+                "IV_SMU_SMU_NIDAQC_NRNPU-2026-02-02_11-28-34",
                 "IV",
-                "IV Plot of 3T RNPU - TEST Volt."
+                "IV Plot of 3T RNPU"
             ]
         },
         {   "name": "Plot VI",
@@ -28,9 +28,22 @@
             "args": [
                 "currents_ei.csv",
                 "voltages_eo.csv",
-                "VI_TEST_VOLT_3T-2026-01-19_15-16-46",
+                "VI_SMU_SMU_NIDAQC_NRNPU-2026-02-02_11-40-27",
                 "VI",
-                "VI Plot of 2T+1Floating RNPU"
+                "VI Plot of 3T RNPU"
+            ]
+        },
+        {   "name": "Plot 1-1",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/plotter.py",
+            "console": "integratedTerminal",
+            "args": [
+                "voltages_ei.csv",
+                "currents_ei.csv",
+                "IV_SMU_SMU_NIDAQC-2026-02-02_10-33-40",
+                "1-1",
+                "IV Plot"
             ]
         },
         {   "name": "Experiment",

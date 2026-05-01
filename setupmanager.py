@@ -116,6 +116,39 @@ class SetupManager(metaclass=Singleton):
         filepath = self.root_folder / filename
         np.savetxt(filepath, data, delimiter=",")
 
+
+    def save_plot_from_csv_files(self, filename_x: str, filename_y: str, labelx, labely, title):
+        """
+        Saves a plot from data in two CSV files.
+        
+        :param self: Instance of SetupManager
+        :param filename_x: Name of the CSV file for x-axis data
+        :param filename_y: Name of the CSV file for y-axis data
+        """
+        filepath_x = self.root_folder / filename_x
+        filepath_y = self.root_folder / filename_y
+        
+        data_x = np.loadtxt(filepath_x, delimiter=",")
+        data_y = np.loadtxt(filepath_y, delimiter=",")
+        
+        fig, ax = plt.subplots(figsize=(5, 5))
+        ax.plot(data_x[60:-60], data_y)
+        ax.set_xlabel(labelx)
+        ax.set_ylabel(labely)
+        ax.set_title(title)
+        ax.grid()
+        ax.axhline(0, alpha=0.4)
+        ax.axvline(0, alpha=0.4)
+        ax.tick_params(direction='in')
+        ax.set_xticks(np.arange(-2.0, 2.0, 0.5))
+        fig.tight_layout()
+
+        plot_filename = f"{filename_x.split('.')[0]}_{filename_y.split('.')[0]}.png"
+        plot_filepath = self.root_folder / plot_filename
+        fig.savefig(plot_filepath)
+
+        self.log_info(f"Plot saved to {plot_filename}")
+
     def _create_metafile(self):
         """
         Creates a meta-file that includes information like the contents of the setup config.

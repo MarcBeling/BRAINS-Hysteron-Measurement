@@ -1,9 +1,9 @@
-name: "VI_TEST_VOLT_3T"
-description: "VI Measurement but with Current measurement using the SMU and an opposing voltmeter. This data is saved as current_ei.csv. 0mV Control Voltage. Physically onnected pads: 2, I, III"
-min_value: -90e-9
-max_value: 60e-9
-data_density: 60
-voltage_range: [-2.0, 2.0]
+name: "VI_TEST_VOLT_2T_MARTEEN"
+description: "VI Measurement but with Current measurement using the SMU and an opposing voltmeter. This data is saved as current_ei.csv. 300mV Control Voltage. Physically onnected pads: RestNIDAQ, I, III. Marteen was overlooking voltage measurement."
+min_value: -10e-9
+max_value: 10e-9
+data_density: 500
+voltage_range: [-2.5, 2.5]
 current_range: [-500e-9, 500e-9]
 amplification: 1
 waveform: 'REZA'
@@ -15,7 +15,7 @@ nidaq:
   update_frequency: 1000.0
   ramp_points: 3000
   samples_per_measurement: 5
-  readout_channels: [2] # 0-7
+  readout_channels: [] # 0-7
   control_voltages:
     2: 0
 

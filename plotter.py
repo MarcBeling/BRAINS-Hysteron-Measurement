@@ -8,7 +8,7 @@ def plot(xdata_name, ydata_name, folder_name='', type="IV", title=""):
     xdata_file: Path = Path(folder_name)/xdata_name
     ydata_file: Path = Path(folder_name)/ydata_name
 
-    xdata = np.loadtxt(xdata_file, delimiter=",")[60:-60]
+    xdata = np.loadtxt(xdata_file, delimiter=",")
     ydata = np.loadtxt(ydata_file, delimiter=",")
 
     fig, ax = plt.subplots()
@@ -26,7 +26,7 @@ def plot(xdata_name, ydata_name, folder_name='', type="IV", title=""):
         ax.axhline(0, color='k', alpha=0.4)
         #ax.axhline(0, color='k', alpha=0.4)
         #ax.axhspan(-50, -40, color='lightblue', alpha=0.3, label="Hysterisis effect")
-        ax.plot(xdata, ydata, label="IV Curve RNPU @ -300mV")
+        ax.plot(xdata[60:-60], ydata, label="IV Curve RNPU @ -300mV")
         ax.set_title(title)
         ax.tick_params(direction='in')
         ax.grid(True)
@@ -41,12 +41,26 @@ def plot(xdata_name, ydata_name, folder_name='', type="IV", title=""):
         ax.axvline(0, color='k', alpha=0.4)
         ax.axhline(0, color='k', alpha=0.4)
         #ax.axvspan(-50, -40, color='lightblue', alpha=0.3, label="Hysterisis effect")
-        ax.plot(xdata, ydata, label="VI Curve RNPU @ 0mV")
+        ax.plot(xdata[60:-60], ydata, label="VI Curve RNPU @ 0mV")
         ax.set_title(title)
         ax.tick_params(direction='in')
         ax.grid(True)
         ax.legend()
         fig.tight_layout()
+
+    elif type == "1-1":
+        ax.set_xlabel(xdata_name)
+        ax.set_ylabel(ydata_name)
+
+        ax.axvline(0, color='k', alpha=0.4)
+        ax.axhline(0, color='k', alpha=0.4)
+        ax.plot(xdata, ydata)
+        ax.set_title(title)
+        ax.tick_params(direction='in')
+        ax.grid(True)
+        ax.legend()
+        fig.tight_layout()       
+
     plt.show()
 
 if __name__ == "__main__":
