@@ -1,8 +1,8 @@
 name: "AI_GENETIC"
 description: "Using genetic algorithm to get a voltage configuration for RNPU hysteresis effect."
 device_measured: "RNPU"
-min_value: -1.4
-max_value: 1.4
+min_value: -1.25
+max_value: 1.25
 data_density: 21
 voltage_range: [-1.5, 1.5]
 current_range: [-300e-9, 300e-9]

@@ -49,7 +49,7 @@ class AI_GENETIC(Experiment):
             float: A value for the fitness for the applied solution.
         """        
         result = HardwareInterface().apply_and_calc_fit(solution, solution_idx)
-        print(f"Solution {solution_idx} | Configuration {solution}\tFitness: {result}")
+        print(f"[Solution {solution_idx}]\nConfiguration {solution}\nFitness: {result}")
         return result # type: ignore
     
 

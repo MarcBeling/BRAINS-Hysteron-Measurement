@@ -173,13 +173,14 @@ class SetupManager(metaclass=Singleton):
             currents_list (List[float]): The list of currents that should be plotted
             foldername (str, optional): Name of the subfolder where the plot should be saved instead. Defaults to "/".
         """        
-        
+
+        np_currents_list = np.asarray(currents_list)
         plt.figure(figsize=(5,4))
         plt.title("IV Curve RNPU")
         plt.axhline(0, color='k', alpha=0.6)
         plt.axvline(0, color='k', alpha=0.6)
         plt.grid()
-        plt.plot(self.get_input_data(), currents_list, color='k')
+        plt.plot(self.get_input_data(), np_currents_list*1e9, color='r')
         plt.xlabel("Voltage in V")
         plt.ylabel("Currents in nA")
         plt.savefig(f"{self.save_name}/plots{foldername}iv_plot.png", dpi=300)
