@@ -8,7 +8,10 @@ import numpy as np
 from typing import List, Dict, Optional, Any
 from util.global_states import global_variables
 import math
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+plt.ioff()
 
 class Singleton(type):
     """Metaclass to enforce Singleton behavior."""

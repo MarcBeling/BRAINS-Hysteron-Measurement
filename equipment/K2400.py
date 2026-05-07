@@ -57,8 +57,8 @@ class K2400():
 
         self.device.use_front_terminals()
         self.device.enable_source()
-        self.device.current_nplc = 1
-        self.device.voltage_nplc = 1
+        self.device.current_nplc = self.config['nplc_current']
+        self.device.voltage_nplc = self.config['nplc_voltage']
         self.device.source_delay = 0.00
         self.device.trigger_count = 1
 

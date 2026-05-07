@@ -34,7 +34,7 @@ class HardwareInterface(metaclass=Singleton):
         return fittness
     
     def compute_fittness(self, response: Response):
-        return np.sum(np.pow((response.get_up_sweep() - response.get_down_sweep()), 2))*((1.0)/len(response.get_up_sweep()))
+        return np.sum(response.get_up_sweep() - response.get_down_sweep())
     
     def close(self):
         self.smu.shutdown()

@@ -3,7 +3,7 @@ description: "Using genetic algorithm to get a voltage configuration for RNPU hy
 device_measured: "RNPU"
 min_value: -1.25
 max_value: 1.25
-data_density: 21
+data_density: 42
 voltage_range: [-1.5, 1.5]
 current_range: [-300e-9, 300e-9]
 amplification: 1
@@ -49,3 +49,5 @@ K2400:
   tolerance_voltage: 0.01
   tolerance_current: 10e-9
   pause_between_set: 0.02
+  nplc_current: 0.01
+  nplc_voltage: 1
