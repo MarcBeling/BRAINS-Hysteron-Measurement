@@ -1,6 +1,7 @@
 
 from equipment.NIDAQ import NIDAQ_chassis
 from equipment.K2400 import K2400
+from util import solution
 from util.setupmanager import SetupManager
 from util.solution import Solution
 from util.response import Response
@@ -34,8 +35,16 @@ class HardwareInterface(metaclass=Singleton):
         return fittness
     
     def compute_fittness(self, response: Response):
-        return np.sum(response.get_up_sweep() - response.get_down_sweep())
+        return np.exp(np.sum(
+                np.abs(
+                response.get_up_sweep() - np.flip(response.get_down_sweep())
+                )
+            )
+        )
     
+    def print_fittness(self, solution, solution_idx, result):
+        self.setupManager.log_info(f"\n(Solution {solution_idx})\nConfiguration:\n{solution}\nFitness: {result:2f}\n")
+
     def close(self):
         self.smu.shutdown()
         self.nidaq.shutdown()
@@ -51,7 +60,7 @@ class PhysicalRNPU():
         self.input = self.config['input_electrodes']
         self.control: List = self.config['control_electrodes']
         self.output: str = self.config['output_electrodes']
-        self.counter = 0
+        self.counter: int = 0
 
         self.all_electrodes = []
         self.all_electrodes.append(self.input)
@@ -91,17 +100,20 @@ class PhysicalRNPU():
         self.sm.plot_dict(current_dict, f"/solution_{solution_idx}/")
         return current_dict
             
-    def sweep(self, solution_idx: int):
+    def sweep(self, solution_idx: int) -> List[float]:
         input_data = self.sm.get_input_data()
         current_list = []
         for voltage in input_data:
             self.set_input({self.input: voltage})
             current_list.append(self.get_output_current())
-        self.sm.create_subfolder(f"data/solution_{self.counter}")
-        self.sm.create_subfolder(f"plots/solution_{self.counter}")
-        self.sm.write_1d_array(f"solution_{self.counter}/currents_{self.output}.csv",current_list)
-        self.sm.plot_list(current_list, f"/solution_{self.counter}/")
-        self.counter = self.counter+1
+        if solution_idx != -1:
+            self.sm.create_subfolder(f"data/Solution_{self.sm.counter}")
+            self.sm.create_subfolder(f"plots/Solution_{self.sm.counter}")
+            self.sm.write_1d_array(f"Solution_{self.sm.counter}/currents_{self.output}_gen_{solution_idx}.csv",current_list)
+            self.sm.plot_list(current_list, f"Solution_{self.sm.counter}/iv_gen_{solution_idx}.png")
+        else:
+            self.sm.write_1d_array("Final_Solution.csv", current_list)
+            self.sm.plot_list(current_list, "Final_Solution.png")
         return current_list
     
     def get_response(self, solution: Solution, solution_idx: int):

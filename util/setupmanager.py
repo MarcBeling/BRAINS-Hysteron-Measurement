@@ -51,6 +51,8 @@ class SetupManager(metaclass=Singleton):
         self.log_file: Path = save_name/"setup.LOG"
         self.save_name = save_name
         self.terminated_normally = True
+        self.counter: int = 0
+        self.subcounter: int = 0
 
         # Create folder if it doesn't exist
         if not os.path.exists(save_name):
@@ -70,6 +72,12 @@ class SetupManager(metaclass=Singleton):
         atexit.register(self._on_exit)
 
         self.log_info("SetupManager initialized.")
+
+    def plus_counter(self):
+        self.counter = self.counter + 1
+
+    def plus_subcounter(self):
+        self.subcounter = self.subcounter + 1
 
     def get_voltage_range(self) -> List[float]:
         """
@@ -169,7 +177,7 @@ class SetupManager(metaclass=Singleton):
 
     def plot_list(self,
                   currents_list: List[float],
-                  foldername: str = "/") -> None:
+                  filename: str = "/") -> None:
         """
         Plots a list of currents in an IV Curve
 
@@ -187,7 +195,7 @@ class SetupManager(metaclass=Singleton):
         plt.plot(self.get_input_data(), np_currents_list*1e9, color='r')
         plt.xlabel("Voltage in V")
         plt.ylabel("Currents in nA")
-        plt.savefig(f"{self.save_name}/plots{foldername}iv_plot.png", dpi=300)
+        plt.savefig(f"{self.save_name}/plots/{filename}", dpi=300)
         plt.close()
 
     def plot_dict(self,

@@ -1,6 +1,7 @@
 from experiments._experiment import Experiment
 from equipment.RNPU import HardwareInterface
 
+from util.solution import Solution
 from util.setupmanager import SetupManager
 from typing import List
 
@@ -50,9 +51,10 @@ class AI_GENETIC(Experiment):
             float: A value for the fitness for the applied solution.
         """        
         result = HardwareInterface().apply_and_calc_fit(solution, solution_idx)
-        print(f"[Solution {solution_idx}]\nConfiguration {solution}\nFitness: {result}\n")
+        HardwareInterface().print_fittness(solution, solution_idx, result)
+        if solution_idx == 19:
+            SetupManager().plus_counter()
         return result # type: ignore
-    
 
     @staticmethod
     def print_solution(best_solution: List[float], best_fitness: float, best_solution_idx: int) -> None:
@@ -72,8 +74,10 @@ class AI_GENETIC(Experiment):
         Runs the genetic algorithm.
         """        
         self.ga_instance.run()
-        best_solution, best_fitness, best_solution_idx = self.ga_instance.best_solution()[0]
-        AI_GENETIC.print_solution(best_solution, best_fitness, best_solution_idx)
+        self.print_solution(self.ga_instance.best_solution()[0], self.ga_instance.best_solution()[1], self.ga_instance.best_solution()[2]) # type: ignore
+        best_solution: Solution = Solution.convert_list_to_solution(
+            self.hardware_interface.rnpu.get_control_electrodes(), self.ga_instance.best_solution()[0]) #type: ignore
+        self.hardware_interface.rnpu.get_response(best_solution, -1)
 
     def plot(self) -> None:
         pass
