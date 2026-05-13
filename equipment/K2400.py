@@ -1,7 +1,7 @@
 from pymeasure.instruments.keithley import Keithley2400
 
 from util.setupmanager import SetupManager
-from typing import Union
+from typing import Union, List
 from util.errors import DeviceNotFoundError, BadConfigError
 
 import numpy as np
@@ -62,6 +62,13 @@ class K2400():
         self.device.source_delay = 0.00
         self.device.trigger_count = 1
 
+        if drive_mode == "VOLTAGE_DRIVEN":
+            self.device.measure_current(self.device.current_nplc, self.compliance_current, False)
+        if drive_mode == "CURRENT_DRIVEN":
+            self.device.measure_voltage(self.device.voltage_nplc, self.compliance_voltage, False)
+
+        self.average_over = self.config["average_over"]
+
 
     def measure_voltage(self) -> float:
         """
@@ -83,9 +90,10 @@ class K2400():
         :return: Current in A
         :rtype: float
         """
-        self.device.measure_current()
-        current = self.device.current
-        return current # type: ignore
+        readings: List[float] = []
+        for i in range(self.average_over):
+            readings.append(self.device.current) # type: ignore
+        return float(np.average(np.asarray(readings)))
 
 
     def set_voltage(self, voltage: float):

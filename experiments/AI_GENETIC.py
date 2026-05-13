@@ -32,7 +32,9 @@ class AI_GENETIC(Experiment):
             mutation_type =         self.config['GA']['mutation_type'],
             mutation_percent_genes= self.config['GA']['mutation_percent_genes'],
             mutation_num_genes =    self.config['GA']['mutation_num_genes'],
-            keep_parents=           self.config["GA"]["keep_parents"]
+            keep_parents=           self.config["GA"]["keep_parents"],
+            parent_selection_type=  self.config["GA"]["parent_selection_type"],
+            K_tournament =          self.config["GA"]["K_tournament"]
         )
 
     @staticmethod
@@ -52,7 +54,7 @@ class AI_GENETIC(Experiment):
         """        
         result = HardwareInterface().apply_and_calc_fit(solution, solution_idx)
         HardwareInterface().print_fittness(solution, solution_idx, result)
-        if solution_idx == 19:
+        if solution_idx == SetupManager().config["GA"]["sol_per_pop"]-1:
             SetupManager().plus_counter()
         return result # type: ignore
 

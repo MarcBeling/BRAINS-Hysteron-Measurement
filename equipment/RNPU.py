@@ -35,12 +35,11 @@ class HardwareInterface(metaclass=Singleton):
         return fittness
     
     def compute_fittness(self, response: Response):
-        return np.exp(np.sum(
+        return np.sum(
                 np.abs(
                 response.get_up_sweep() - np.flip(response.get_down_sweep())
                 )
             )
-        )
     
     def print_fittness(self, solution, solution_idx, result):
         self.setupManager.log_info(f"\n(Solution {solution_idx})\nConfiguration:\n{solution}\nFitness: {result:2f}\n")

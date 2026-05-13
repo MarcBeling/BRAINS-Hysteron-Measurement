@@ -1,11 +1,11 @@
 name: "AI_GENETIC"
 description: "Using genetic algorithm to get a voltage configuration for RNPU hysteresis effect."
 device_measured: "RNPU"
-min_value: -1.75
-max_value: 1.75
+min_value: -1.5
+max_value: 1.5
 data_density: 41
-voltage_range: [-1.8, 1.8]
-current_range: [-300e-9, 300e-9]
+voltage_range: [-1.55, 1.55]
+current_range: [-400e-9, 400e-9]
 amplification: 1
 wavetype: 'SWEEP'
 
@@ -16,14 +16,16 @@ RNPU:
   sweep_all: False
 
 GA:
-  num_generations: 2
-  num_parents_mating: 2
-  sol_per_pop: 2
+  num_generations: 30
+  num_parents_mating: 6
+  sol_per_pop: 10
   gene_space: {"low": -1.0, "high": 1.0}
   mutation_type: "random"
   mutation_percent_genes: 25
   mutation_num_genes: 1
-  keep_parents: 1
+  keep_parents: 3
+  parent_selection_type: "tournament"
+  K_tournament: 4
 
 nidaq:
   activation_module_id: 'cDAQ1Mod1'
@@ -48,6 +50,7 @@ K2400:
   drive_mode: 'VOLTAGE_DRIVEN'
   tolerance_voltage: 0.01
   tolerance_current: 10e-9
-  pause_between_set: 0.00
+  pause_between_set: 0.02
   nplc_current: 0.01
   nplc_voltage: 1
+  average_over: 1

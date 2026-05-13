@@ -44,9 +44,10 @@ if __name__=="__main__":
 
     try:
         experiment.run()
-        experiment.plot()
-        winsound.Beep(100, 1000)
-    except Exception as e:
-        print("Measurement interrupted by error or divine intervention.")
         experiment.close()
-    experiment.close()
+    except Exception as e:
+        print(f"Measurement interrupted by {e}.")
+        experiment.close()
+    except KeyboardInterrupt:
+        print(f"Measurement stopped by user.")
+        experiment.close()
