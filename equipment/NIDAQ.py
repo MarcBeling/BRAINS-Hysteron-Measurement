@@ -246,7 +246,6 @@ class NIDAQ_chassis():
         with nidaqmx.Task() as task:
             task.ao_channels.add_ao_voltage_chan(activation_string)
             task.write(voltages, auto_start=True) #type: ignore
-        
 
     def set_voltage_configuration(self, control_voltages: Dict[int, float]):
         voltages = list(control_voltages.values())

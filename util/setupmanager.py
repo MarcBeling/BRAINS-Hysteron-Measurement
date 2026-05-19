@@ -1,3 +1,4 @@
+from cProfile import label
 import os
 import atexit
 from datetime import datetime
@@ -11,6 +12,7 @@ import math
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 plt.ioff()
 
 class Singleton(type):
@@ -177,7 +179,8 @@ class SetupManager(metaclass=Singleton):
 
     def plot_list(self,
                   currents_list: List[float],
-                  filename: str = "/") -> None:
+                  filename: str = "/",
+                  control_voltages: Dict[int, float] = {}) -> None:
         """
         Plots a list of currents in an IV Curve
 
@@ -192,7 +195,16 @@ class SetupManager(metaclass=Singleton):
         plt.axhline(0, color='k', alpha=0.6)
         plt.axvline(0, color='k', alpha=0.6)
         plt.grid()
-        plt.plot(self.get_input_data(), np_currents_list*1e9, color='r')
+        if control_voltages != {}:
+            text_string = ""
+            for channel_id, voltage in control_voltages.items():
+                text_string += f"{channel_id}:{voltage:.5f}V\n"
+            text_string.removesuffix("\n")
+            plt.plot(self.get_input_data(), np_currents_list*1e9, color='r', label=text_string)
+            handles = mlines.Line2D([], [], color='none', marker='none', linestyle='none')
+            plt.legend(handles=[handles], labels=[text_string])
+        else:
+            plt.plot(self.get_input_data(), np_currents_list*1e9, color='r')
         plt.xlabel("Voltage in V")
         plt.ylabel("Currents in nA")
         plt.savefig(f"{self.save_name}/plots/{filename}", dpi=300)

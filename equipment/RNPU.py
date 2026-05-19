@@ -109,10 +109,10 @@ class PhysicalRNPU():
             self.sm.create_subfolder(f"data/Solution_{self.sm.counter}")
             self.sm.create_subfolder(f"plots/Solution_{self.sm.counter}")
             self.sm.write_1d_array(f"Solution_{self.sm.counter}/currents_{self.output}_gen_{solution_idx}.csv",current_list)
-            self.sm.plot_list(current_list, f"Solution_{self.sm.counter}/iv_gen_{solution_idx}.png")
+            self.sm.plot_list(current_list, f"Solution_{self.sm.counter}/iv_gen_{solution_idx}.png", self.cv_dict)
         else:
             self.sm.write_1d_array("Final_Solution.csv", current_list)
-            self.sm.plot_list(current_list, "Final_Solution.png")
+            self.sm.plot_list(current_list, "Final_Solution.png", self.cv_dict)
         return current_list
     
     def get_response(self, solution: Solution, solution_idx: int):

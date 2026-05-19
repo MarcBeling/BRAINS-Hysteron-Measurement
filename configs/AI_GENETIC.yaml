@@ -11,7 +11,7 @@ wavetype: 'SWEEP'
 
 RNPU:
   input_electrodes: 7
-  control_electrodes: [0, 1, 2, 4, 5, 6, 7]
+  control_electrodes: [0, 1, 2, 4, 5, 6]
   output_electrodes: "IV"
   sweep_all: False
 
@@ -23,7 +23,7 @@ GA:
   mutation_type: "random"
   mutation_percent_genes: 25
   mutation_num_genes: 1
-  keep_parents: 3
+  keep_parents: 2
   parent_selection_type: "tournament"
   K_tournament: 4
 
