@@ -15,7 +15,7 @@ nidaq:
   activation_module_id: 'cDAQ1Mod1'
   readout_module_id: 'cDAQ1Mod2'
   sample_frequency: 10000.0
-  update_frequency: 5000.0
+  update_frequency: 10000.0
   ramp_points: 1000
   samples_per_measurement: 5
   readout_channels: []

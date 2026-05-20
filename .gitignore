@@ -96,3 +96,4 @@ util/__pycache__/setupmanager.cpython-39.pyc
 util/__pycache__/solution.cpython-39.pyc
 util/__pycache__/waveform.cpython-39.pyc
 experiments/__pycache__/IV_RANDOM.cpython-39.pyc
+experiments/__pycache__/IV_PULSE.cpython-39.pyc

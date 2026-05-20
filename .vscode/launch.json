@@ -187,6 +187,17 @@
             ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "IV_PULSE",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "IV_PULSE"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
         }
     ]
 }

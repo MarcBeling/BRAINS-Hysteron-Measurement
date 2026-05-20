@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from util.setupmanager import SetupManager
 from plotters.plotter import plot_iv_curve
-class IV_NI_SMU(Experiment):
+class IV_PULSE(Experiment):
     
     def __init__(self) -> None:
         super().__init__()
@@ -38,10 +38,7 @@ class IV_NI_SMU(Experiment):
         # self.plot()
 
     def plot(self):
-        plot_iv_curve(self.voltage_input,
-                      self.current_readout,
-                      f"IV Curve RNPU @ Pad {self.input_pad_id} and {self.readout_pad_id}",
-                      f"{self.sm.get_folder()}/plots/iv_plot_{self.input_pad_id}_{self.readout_pad_id}.png")
+        self.sm.plot_time(self.current_readout, "current_time_response.png")
 
     def close(self):
         self.nidaq.shutdown()

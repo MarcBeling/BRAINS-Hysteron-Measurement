@@ -15,7 +15,7 @@ from experiments.IV_MARTIN import IV_MARTIN
 from experiments.IV_MARTIN_SMU import IV_MARTIN_SMU
 from experiments.IV_RANDOM import IV_RANDOM
 from util.global_states import global_variables
-
+from experiments.IV_PULSE import IV_PULSE
 AVAILABLE_MODES = {
     "AI_GENETIC": AI_GENETIC,
     "AI_JAN": AI_JAN,
@@ -29,7 +29,8 @@ AVAILABLE_MODES = {
     "IV_PULL_PUSH": IV_PULL_PUSH,
     "IV_MARTIN": IV_MARTIN,
     "IV_MARTIN_SMU": IV_MARTIN_SMU,
-    "IV_RANDOM": IV_RANDOM
+    "IV_RANDOM": IV_RANDOM,
+    "IV_PULSE": IV_PULSE
 }
 
 if __name__=="__main__":

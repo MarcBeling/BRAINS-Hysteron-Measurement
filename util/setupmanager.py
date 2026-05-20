@@ -234,6 +234,31 @@ class SetupManager(metaclass=Singleton):
         plt.savefig(f"{self.save_name}/plots/{filename}", dpi=300)
         plt.close()
 
+    def plot_time(self, list_signal: List[float], filename = ""):
+
+        plt.figure(figsize=(5,4))
+        plt.title("Response Pulses")
+        plt.axhline(0, color='k', alpha=0.6)
+        plt.axvline(0, color='k', alpha=0.6)
+        plt.grid()
+        plt.plot(list_signal, color='green')
+        plt.xlabel("Time (a.u.)")
+        plt.ylabel("Current in nA")
+
+        pos_idx = np.where(self.input_data == self.config["max_value"])[0]
+        neg_idx = np.where(self.input_data == self.config["min_value"])[0]
+
+        for i in neg_idx:
+            plt.axvline(i, color='red', linestyle='--', alpha=0.7)
+
+        for i in pos_idx:
+            plt.axvline(i, color='blue', linestyle='--', alpha=0.7)
+            
+        plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
+        plt.tight_layout()
+        plt.savefig(f"{self.save_name}/plots/{filename}", dpi=300)
+        plt.close()
+
     def plot_response_and_fittness(self, solution: Solution, solution_idx: int, response: Response, fittness: float, filename: str = '/'):
 
         currents_list = response.get_data()
