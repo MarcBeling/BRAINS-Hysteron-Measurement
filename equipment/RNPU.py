@@ -114,7 +114,7 @@ class PhysicalRNPU():
     def sweep(self, solution_idx: int) -> List[float]:
         input_data = self.sm.get_input_data()
         current_list = []
-        for voltage in input_data:
+        for voltage in input_data[1200:-200]:
             self.set_input({self.input: voltage})
             current_list.append(self.get_output_current())
         if solution_idx != -1:

@@ -2,7 +2,7 @@ import numpy as np
 from typing import Dict, List
 
 from util.errors import NoMeasurementError
-from util.configreader import Config
+import random
 from itertools import repeat
 
 import nidaqmx
@@ -166,6 +166,16 @@ class NIDAQ_chassis():
         self.setupManager.log_info(f'Following voltages will be applied: {",".join(map(str, self.activation_voltages.values()))} on channels {",".join(map(str, self.activation_channels.keys()))} respectively')
         # self.setupManager.wait_for_user_input()
         self._calibrate_to_zero_all()
+
+    def set_random_control(self):
+        list_randoms = []
+        for i in self.config['control_voltages']:
+            if i != self.setupManager.get_config()["input_pad"]:
+                random_control_voltage = random.uniform(-1, 1)
+                list_randoms.append(random_control_voltage)
+                self.activation_channels[i].ramp_to_voltage(random_control_voltage)
+        return list_randoms
+    
 
     def start_active_all_channels(self):
         """

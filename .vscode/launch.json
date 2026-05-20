@@ -176,6 +176,17 @@
             ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "IV_RANDOM",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "main",
+            "args": [
+                "IV_RANDOM"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
         }
     ]
 }

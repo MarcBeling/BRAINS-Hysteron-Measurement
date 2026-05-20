@@ -15,6 +15,8 @@ class WaveType(Enum):
     REZA = 3
     STATIC = 4
     SWEEP = 5
+    REMAIN = 6
+    PULSE = 7
 
 class Waveform():
     """
@@ -42,6 +44,10 @@ class Waveform():
             self.generate_static()
         elif type == WaveType.SWEEP:
             self.generate_sweep()
+        elif type == WaveType.REMAIN:
+            self.generate_remain()
+        elif type == WaveType.PULSE:
+            self.generate_pulse()
         else:
             raise ValueError('Unfamiliar WaveType Enum.')
         
@@ -64,18 +70,27 @@ class Waveform():
         return self
     
     def generate_reza(self):
-        ramp_start = np.linspace(0, self.min_value, 20) # 10s
-        rest = np.linspace(self.min_value, self.min_value, 20) # 20
+        ramp_start = np.linspace(0, self.min_value, 100) # 10s
+        rest = np.linspace(self.min_value, self.min_value, 1000) # 20
         ramp_up = np.linspace(self.min_value, self.max_value, self.data_per_sec)
         ramp_down = np.linspace(self.max_value, self.min_value, self.data_per_sec)
         ramp_up = np.linspace(self.min_value, self.max_value, self.data_per_sec)
         ramp_down = np.linspace(self.max_value, self.min_value, self.data_per_sec)
-        rest = np.linspace(self.min_value, self.min_value, 40) # 20
-        ramp_reset = np.linspace(self.min_value, 0, 20) # 10s
-        self._data = np.concatenate((ramp_start, rest, ramp_up, ramp_down, ramp_up, ramp_down, rest, ramp_reset))        
+        ramp_reset = np.linspace(self.min_value, 0, 1000) # 10s
+        self._data = np.concatenate((ramp_start, rest, ramp_up, ramp_down, ramp_up, ramp_down, ramp_reset))        
 
     def generate_static(self):
         self._data = np.full(self.data_per_sec, self.min_value)
+
+    def generate_remain(self):
+        ramp_start = np.linspace(0, self.min_value, 10)
+        ramp_up_1 = np.linspace(self.min_value, self.max_value/2, self.data_per_sec/2)
+        ramp_up_stop = np.linspace(self.max_value/2, self.max_value/2, 40)
+        ramp_up_2 = np.linspace(self.max_value/2, self.max_value, self.data_per_sec/2)
+        ramp_pause = np.linspace(self.max_value, self.max_value, 10)
+        ramp_down = np.linspace(self.max_value, self.min_value, self.data_per_sec)
+        ramp_stop = np.linspace(self.min_value, 0, 10)
+        self._data = np.concatenate((ramp_start, ramp_up_1, ramp_up_stop, ramp_up_2, ramp_pause, ramp_down, ramp_stop))        
 
     def generate_sweep(self):
         ramp_start = np.linspace(0, self.min_value, 10)
@@ -84,6 +99,12 @@ class Waveform():
         ramp_down = np.linspace(self.max_value, self.min_value, self.data_per_sec)
         ramp_stop = np.linspace(self.min_value, 0, 10)
         self._data = np.concatenate((ramp_start, ramp_up, ramp_pause, ramp_down, ramp_stop))
+
+    def generate_pulse(self):
+        pulse_up = np.asarray([self.max_value])
+        pulse_down = np.asarray([self.min_value])
+        pause = np.linspace(0, 0, self.data_per_sec)
+        self._data = np.concatenate((pulse_up, pause, pulse_down, pause, pulse_up, pause, pulse_down, pause))
 
     def clip_waveform(self, min_value, max_value):
         self._data = np.clip(self._data, min_value, max_value)

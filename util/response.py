@@ -14,16 +14,16 @@ class Response():
 
     def __init__(self, current_values: List[float]) -> None:
         self.data = np.asarray(current_values)
-        self.up_sweep, self.down_sweep = np.array_split(self.data, 2)
+        self.up_sweep1, self.down_sweep1, self.up_sweep2, self.down_sweep2 = np.array_split(self.data, 4)
     
     def __getitem__(self, key: int) -> float:
         return self.data[key]
     
     def get_up_sweep(self) -> np.ndarray:
-        return self.up_sweep
+        return np.concatenate((self.up_sweep1, self.up_sweep2))
     
     def get_down_sweep(self) -> np.ndarray:
-        return self.down_sweep
+        return np.concatenate((self.down_sweep1, self.down_sweep2))
 
     def get_data(self) -> np.ndarray:
         return self.data

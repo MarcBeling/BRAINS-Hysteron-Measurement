@@ -13,9 +13,8 @@ from experiments.IV_DYNAMIC import IV_DYNAMIC
 from experiments.IV_PULL_PUSH import IV_PULL_PUSH
 from experiments.IV_MARTIN import IV_MARTIN
 from experiments.IV_MARTIN_SMU import IV_MARTIN_SMU
-
+from experiments.IV_RANDOM import IV_RANDOM
 from util.global_states import global_variables
-import winsound
 
 AVAILABLE_MODES = {
     "AI_GENETIC": AI_GENETIC,
@@ -29,7 +28,8 @@ AVAILABLE_MODES = {
     "IV_DYNAMIC": IV_DYNAMIC,
     "IV_PULL_PUSH": IV_PULL_PUSH,
     "IV_MARTIN": IV_MARTIN,
-    "IV_MARTIN_SMU": IV_MARTIN_SMU
+    "IV_MARTIN_SMU": IV_MARTIN_SMU,
+    "IV_RANDOM": IV_RANDOM
 }
 
 if __name__=="__main__":
@@ -44,6 +44,7 @@ if __name__=="__main__":
 
     try:
         experiment.run()
+        experiment.plot()
         experiment.close()
     except Exception as e:
         print(f"Measurement interrupted by {e}.")
