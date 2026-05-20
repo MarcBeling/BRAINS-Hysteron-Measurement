@@ -14,6 +14,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
+from matplotlib.ticker import MaxNLocator
 plt.ioff()
 
 class Singleton(type):
@@ -219,8 +220,17 @@ class SetupManager(metaclass=Singleton):
         plt.axvline(0, color='k', alpha=0.6)
         plt.grid()
         plt.plot(list_fitnesses, color='g')
+        
+        distance_between_gens = self.get_config()["GA"]["sol_per_pop"]-1
+
+        temp = [i * distance_between_gens for i in range(self.counter-1)]
+        generations_on_the_axis = [x + 2 for x in temp]
+        for id, x in enumerate(generations_on_the_axis):
+            plt.axvline(x=x, color='r', linestyle='--')
         plt.xlabel("Generated solutions")
         plt.ylabel("Fitness")
+        plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
+        plt.tight_layout()
         plt.savefig(f"{self.save_name}/plots/{filename}", dpi=300)
         plt.close()
 
@@ -229,22 +239,23 @@ class SetupManager(metaclass=Singleton):
         currents_list = response.get_data()
         np_currents_list = np.asarray(currents_list)
         plt.figure(figsize=(5,4))
-        plt.title(f"GA {solution_idx}: IV Curve RNPU\nFitness: {fittness: .2f}")
+        plt.title(f"[GA] SOL_ID: {solution_idx}, GEN: {self.counter}: IV Curve RNPU\nFitness: {fittness: .2f}")
         plt.axhline(0, color='k', alpha=0.6)
         plt.axvline(0, color='k', alpha=0.6)
         plt.grid()
 
         text_string = ""
         for channel_id, voltage in solution.get_values().items():
-            text_string += f"{channel_id}:{voltage}V\n"
+            text_string += f"{channel_id}: {voltage:.3f}V\n"
             
         text_string.removesuffix("\n")
-        plt.plot(self.get_input_data(), np_currents_list*1e9, color='r', label=text_string)
+        plt.plot(self.get_input_data(), np_currents_list, color='r', label=text_string)
         handles = mlines.Line2D([], [], color='none', marker='none', linestyle='none')
         plt.legend(handles=[handles], labels=[text_string])
 
         plt.xlabel("Voltage in V")
         plt.ylabel("Currents in nA")
+        plt.tight_layout()
         plt.savefig(f"{self.save_name}/plots/{filename}", dpi=300)
         plt.close()  
 

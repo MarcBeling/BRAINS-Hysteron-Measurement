@@ -177,6 +177,15 @@ class NIDAQ_chassis():
                 self.setupManager.log_info(f"(NIDAQ Channel {channel}) Voltage {voltage}V applied.")
                 self.activation_channels[channel].ramp_to_voltage(voltage)
 
+    def ramp_all_channels(self, control_voltages: Dict[int, float]):
+        """
+        Activates all channels with the voltages provided in `self.activation_voltages`.
+        
+        :param self: Instance of NIDAQ_chassis
+        """
+        for channel, voltage in control_voltages.items():
+                self.activation_channels[channel].ramp_to_voltage(voltage)
+
     def set_voltage(self, id: int, target_voltage: float, ramp: bool = False, verbose: bool = False):
         if ramp:
             self.activation_channels[id].ramp_to_voltage(target_voltage)

@@ -3,9 +3,9 @@ description: "Using genetic algorithm to get a voltage configuration for RNPU hy
 device_measured: "RNPU"
 min_value: -1.5
 max_value: 1.5
-data_density: 61
+data_density: 40
 voltage_range: [-1.55, 1.55]
-current_range: [-400e-9, 400e-9]
+current_range: [-700e-9, 700e-9]
 amplification: 1
 wavetype: 'SWEEP'
 
@@ -18,21 +18,21 @@ RNPU:
 GA:
   num_generations: 30
   num_parents_mating: 6
-  sol_per_pop: 10
+  sol_per_pop: 20
   gene_space: {"low": -1.0, "high": 1.0}
   mutation_type: "random"
   mutation_percent_genes: 25
-  mutation_num_genes: 1
+  mutation_num_genes: 4
   keep_parents: 2
   parent_selection_type: "tournament"
-  K_tournament: 4
+  K_tournament: 5
 
 nidaq:
   activation_module_id: 'cDAQ1Mod1'
   readout_module_id: 'cDAQ1Mod2'
   sample_frequency: 10000.0
   update_frequency: 10000.0
-  ramp_points: 1000
+  ramp_points: 500
   samples_per_measurement: 5
   readout_channels: [0, 1, 2, 4, 5, 6, 7] #0-7
   control_voltages:
@@ -49,8 +49,8 @@ K2400:
   timeout: 50000
   drive_mode: 'VOLTAGE_DRIVEN'
   tolerance_voltage: 0.01
-  tolerance_current: 10e-9
-  pause_between_set: 0.02
+  tolerance_current: 1e-9
+  pause_between_set: 0.00
   nplc_current: 0.01
   nplc_voltage: 1
-  average_over: 1
+  average_over: 5

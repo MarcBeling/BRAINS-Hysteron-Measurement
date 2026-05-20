@@ -38,12 +38,12 @@ class HardwareInterface(metaclass=Singleton):
                                            solution_idx,
                                            response,
                                            fittness,
-                                           f"Solution_{self.sm.counter}/iv_gen_{solution_idx}.png")
+                                           f"Generation_{self.sm.counter}/iv_sol_{solution_idx}.png")
         return fittness
     
     def compute_fittness(self, response: Response):
         return np.sum(
-                np.pow(
+                np.power(
                     (response.get_up_sweep() - np.flip(response.get_down_sweep())),
                     2)
                 )
@@ -82,7 +82,7 @@ class PhysicalRNPU():
 
     def set_control_voltage_configuration(self, control_voltages: Dict[int, float]):
         self.cv_dict = control_voltages
-        self.nidaq.set_voltage_configuration(control_voltages)
+        self.nidaq.ramp_all_channels(control_voltages)
 
     def set_input(self, input_values: Dict[int, float]):
         self.nidaq.set_voltage(next(iter(input_values.keys())), next(iter(input_values.values())))
@@ -118,9 +118,10 @@ class PhysicalRNPU():
             self.set_input({self.input: voltage})
             current_list.append(self.get_output_current())
         if solution_idx != -1:
-            self.sm.create_subfolder(f"data/Solution_{self.sm.counter}")
-            self.sm.create_subfolder(f"plots/Solution_{self.sm.counter}")
-            self.sm.write_1d_array(f"Solution_{self.sm.counter}/currents_{self.output}_gen_{solution_idx}.csv",current_list)
+            self.sm.create_subfolder(f"data/Generation_{self.sm.counter}")
+            self.sm.create_subfolder(f"plots/Generation_{self.sm.counter}")
+            self.sm.write_1d_array(f"Generation_{self.sm.counter}/currents_{self.output}_sol_{solution_idx}.csv",current_list)
+            self.sm.write_1d_array(f"Generation_{self.sm.counter}/control_voltages_sol_{solution_idx}.csv", list(self.cv_dict.values()))
         else:
             self.sm.write_1d_array("Final_Solution.csv", current_list)
             self.sm.plot_list(current_list, "Final_Solution.png", self.cv_dict)

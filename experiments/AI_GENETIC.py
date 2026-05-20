@@ -82,7 +82,7 @@ class AI_GENETIC(Experiment):
             self.hardware_interface.rnpu.get_control_electrodes(),
             self.ga_instance.best_solution()[0]) #type: ignore
         self.hardware_interface.rnpu.get_response(best_solution, -1)
-        self.sm.plot_fittness(self.hardware_interface.list_fittness)
+        self.sm.plot_fittness(self.hardware_interface.list_fittness, "Fitness_history")
 
     def plot(self) -> None:
         raise NotImplementedError()
