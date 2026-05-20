@@ -56,6 +56,7 @@ class AI_GENETIC(Experiment):
         HardwareInterface().print_fittness(solution, solution_idx, result)
         if solution_idx == SetupManager().config["GA"]["sol_per_pop"]-1:
             SetupManager().plus_counter()
+        HardwareInterface().record_fittness(result)
         return result # type: ignore
 
     @staticmethod
@@ -78,11 +79,13 @@ class AI_GENETIC(Experiment):
         self.ga_instance.run()
         self.print_solution(self.ga_instance.best_solution()[0], self.ga_instance.best_solution()[1], self.ga_instance.best_solution()[2]) # type: ignore
         best_solution: Solution = Solution.convert_list_to_solution(
-            self.hardware_interface.rnpu.get_control_electrodes(), self.ga_instance.best_solution()[0]) #type: ignore
+            self.hardware_interface.rnpu.get_control_electrodes(),
+            self.ga_instance.best_solution()[0]) #type: ignore
         self.hardware_interface.rnpu.get_response(best_solution, -1)
+        self.sm.plot_fittness(self.hardware_interface.list_fittness)
 
     def plot(self) -> None:
-        pass
+        raise NotImplementedError()
 
     def close(self):
         """

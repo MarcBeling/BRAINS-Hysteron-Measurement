@@ -22,32 +22,44 @@ class Singleton(type):
 class HardwareInterface(metaclass=Singleton):
 
     def __init__(self) -> None:
-        self.setupManager: SetupManager = SetupManager()
+        self.sm: SetupManager = SetupManager()
         self.nidaq = NIDAQ_chassis()
         self.smu = K2400()
         self.rnpu = PhysicalRNPU(self.nidaq, self.smu)
+        self.list_fittness: List[float] = []
 
     def apply_and_calc_fit(self, control_voltages: List[float], solution_idx):
         solution: Solution = Solution.convert_list_to_solution(
             self.rnpu.get_control_electrodes(), control_voltages)
-        response = self.rnpu.get_response(solution, solution_idx)
+        response = self.rnpu.get_response(solution,
+                                          solution_idx)
         fittness = self.compute_fittness(response)
+        self.sm.plot_response_and_fittness(solution,
+                                           solution_idx,
+                                           response,
+                                           fittness,
+                                           f"Solution_{self.sm.counter}/iv_gen_{solution_idx}.png")
         return fittness
     
     def compute_fittness(self, response: Response):
         return np.sum(
-                np.abs(
-                response.get_up_sweep() - np.flip(response.get_down_sweep())
+                np.pow(
+                    (response.get_up_sweep() - np.flip(response.get_down_sweep())),
+                    2)
                 )
-            )
+    
+    def get_fittness(self) -> List[float]:
+        return self.list_fittness
+
+    def record_fittness(self, fittness: float):
+        self.list_fittness.append(fittness)
     
     def print_fittness(self, solution, solution_idx, result):
-        self.setupManager.log_info(f"\n(Solution {solution_idx})\nConfiguration:\n{solution}\nFitness: {result:2f}\n")
+        self.sm.log_info(f"\n(Solution {solution_idx})\nConfiguration:\n{solution}\nFitness: {result:2f}\n")
 
     def close(self):
         self.smu.shutdown()
         self.nidaq.shutdown()
-
 
 class PhysicalRNPU():
 
@@ -73,11 +85,11 @@ class PhysicalRNPU():
         self.nidaq.set_voltage_configuration(control_voltages)
 
     def set_input(self, input_values: Dict[int, float]):
-        self.nidaq.set_voltage(list(input_values.keys())[0], list(input_values.values())[0])
+        self.nidaq.set_voltage(next(iter(input_values.keys())), next(iter(input_values.values())))
 
     def get_output_current_all(self, include_smu: bool = True):
         currents_out = self.nidaq.get_currents_bulk(list(self.nidaq.readout_channels.keys()))
-        currents_out = {key: value for key, value in currents_out.items()}
+        currents_out = dict(currents_out.items())
         if include_smu:
             currents_out[self.output] = self.smu.measure_current() # type: ignore
         return currents_out
@@ -109,7 +121,6 @@ class PhysicalRNPU():
             self.sm.create_subfolder(f"data/Solution_{self.sm.counter}")
             self.sm.create_subfolder(f"plots/Solution_{self.sm.counter}")
             self.sm.write_1d_array(f"Solution_{self.sm.counter}/currents_{self.output}_gen_{solution_idx}.csv",current_list)
-            self.sm.plot_list(current_list, f"Solution_{self.sm.counter}/iv_gen_{solution_idx}.png", self.cv_dict)
         else:
             self.sm.write_1d_array("Final_Solution.csv", current_list)
             self.sm.plot_list(current_list, "Final_Solution.png", self.cv_dict)

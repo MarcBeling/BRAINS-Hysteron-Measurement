@@ -24,3 +24,6 @@ class Response():
     
     def get_down_sweep(self) -> np.ndarray:
         return self.down_sweep
+
+    def get_data(self) -> np.ndarray:
+        return self.data

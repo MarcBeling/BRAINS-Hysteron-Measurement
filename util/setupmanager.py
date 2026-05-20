@@ -1,9 +1,10 @@
-from cProfile import label
 import os
 import atexit
 from datetime import datetime
 from pathlib import Path
 from util.configreader import Config
+from util.response import Response
+from util.solution import Solution
 from util.waveform import Waveform, WaveType
 import numpy as np
 from typing import List, Dict, Optional, Any
@@ -209,6 +210,43 @@ class SetupManager(metaclass=Singleton):
         plt.ylabel("Currents in nA")
         plt.savefig(f"{self.save_name}/plots/{filename}", dpi=300)
         plt.close()
+
+    def plot_fittness(self, list_fitnesses: List[float], filename = "/"):
+
+        plt.figure(figsize=(5,4))
+        plt.title("Fitness History")
+        plt.axhline(0, color='k', alpha=0.6)
+        plt.axvline(0, color='k', alpha=0.6)
+        plt.grid()
+        plt.plot(list_fitnesses, color='g')
+        plt.xlabel("Generated solutions")
+        plt.ylabel("Fitness")
+        plt.savefig(f"{self.save_name}/plots/{filename}", dpi=300)
+        plt.close()
+
+    def plot_response_and_fittness(self, solution: Solution, solution_idx: int, response: Response, fittness: float, filename: str = '/'):
+
+        currents_list = response.get_data()
+        np_currents_list = np.asarray(currents_list)
+        plt.figure(figsize=(5,4))
+        plt.title(f"GA {solution_idx}: IV Curve RNPU\nFitness: {fittness: .2f}")
+        plt.axhline(0, color='k', alpha=0.6)
+        plt.axvline(0, color='k', alpha=0.6)
+        plt.grid()
+
+        text_string = ""
+        for channel_id, voltage in solution.get_values().items():
+            text_string += f"{channel_id}:{voltage}V\n"
+            
+        text_string.removesuffix("\n")
+        plt.plot(self.get_input_data(), np_currents_list*1e9, color='r', label=text_string)
+        handles = mlines.Line2D([], [], color='none', marker='none', linestyle='none')
+        plt.legend(handles=[handles], labels=[text_string])
+
+        plt.xlabel("Voltage in V")
+        plt.ylabel("Currents in nA")
+        plt.savefig(f"{self.save_name}/plots/{filename}", dpi=300)
+        plt.close()  
 
     def plot_dict(self,
                   currents_dict: Dict[str, List[float]],

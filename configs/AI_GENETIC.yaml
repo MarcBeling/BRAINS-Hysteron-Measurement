@@ -3,7 +3,7 @@ description: "Using genetic algorithm to get a voltage configuration for RNPU hy
 device_measured: "RNPU"
 min_value: -1.5
 max_value: 1.5
-data_density: 41
+data_density: 61
 voltage_range: [-1.55, 1.55]
 current_range: [-400e-9, 400e-9]
 amplification: 1
