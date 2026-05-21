@@ -17,6 +17,7 @@ class WaveType(Enum):
     SWEEP = 5
     REMAIN = 6
     PULSE = 7
+    CLIFFHANGER = 8
 
 class Waveform():
     """
@@ -48,6 +49,8 @@ class Waveform():
             self.generate_remain()
         elif type == WaveType.PULSE:
             self.generate_pulse()
+        elif type == WaveType.CLIFFHANGER:
+            self.generate_cliffhanger()
         else:
             raise ValueError('Unfamiliar WaveType Enum.')
         
@@ -105,6 +108,14 @@ class Waveform():
         pulse_down = np.asarray([self.min_value])
         pause = np.linspace(0, 0, self.data_per_sec)
         self._data = np.concatenate((pulse_up, pause, pulse_down, pause, pulse_up, pause, pulse_down, pause))
+
+    def generate_cliffhanger(self):
+        ramp_start = np.linspace(0, self.min_value, 10)
+        ramp_up = np.linspace(self.min_value, self.max_value, self.data_per_sec)
+        ramp_pause = np.linspace(self.max_value, self.max_value, 30)
+        ramp_down = np.linspace(self.max_value, 0, int(self.data_per_sec/2.0))
+        ramp_cliffhanger = np.linspace(0, 0, self.data_per_sec)
+        self._data = np.concatenate((ramp_start, ramp_up, ramp_pause, ramp_down, ramp_cliffhanger))        
 
     def clip_waveform(self, min_value, max_value):
         self._data = np.clip(self._data, min_value, max_value)

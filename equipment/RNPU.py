@@ -42,11 +42,10 @@ class HardwareInterface(metaclass=Singleton):
         return fittness
     
     def compute_fittness(self, response: Response):
-        return np.sum(
-                np.power(
-                    (response.get_up_sweep() - np.flip(response.get_down_sweep())),
-                    2)
-                )
+        result = np.sum(np.abs(response.get_up_sweep() - np.flip(response.get_down_sweep())))
+        print(result)
+        return np.log(result)
+
     
     def get_fittness(self) -> List[float]:
         return self.list_fittness
@@ -114,9 +113,10 @@ class PhysicalRNPU():
     def sweep(self, solution_idx: int) -> List[float]:
         input_data = self.sm.get_input_data()
         current_list = []
-        for voltage in input_data[1200:-200]:
+        for i, voltage in enumerate(input_data):
             self.set_input({self.input: voltage})
-            current_list.append(self.get_output_current())
+            if i > 9 and i < len(input_data)-10:
+                current_list.append(self.get_output_current())
         if solution_idx != -1:
             self.sm.create_subfolder(f"data/Generation_{self.sm.counter}")
             self.sm.create_subfolder(f"plots/Generation_{self.sm.counter}")

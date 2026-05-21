@@ -264,7 +264,7 @@ class SetupManager(metaclass=Singleton):
         currents_list = response.get_data()
         np_currents_list = np.asarray(currents_list)
         plt.figure(figsize=(5,4))
-        plt.title(f"[GA] SOL_ID: {solution_idx}, GEN: {self.counter}: IV Curve RNPU\nFitness: {fittness: .2f}")
+        plt.title(f"[GA] SOL_ID: {solution_idx}, GEN: {self.counter}:\nIV Curve RNPU + 30 MOhm Resistor\nFitness: {fittness: .2f}")
         plt.axhline(0, color='k', alpha=0.6)
         plt.axvline(0, color='k', alpha=0.6)
         plt.grid()
@@ -274,7 +274,7 @@ class SetupManager(metaclass=Singleton):
             text_string += f"{channel_id}: {voltage:.3f}V\n"
             
         text_string.removesuffix("\n")
-        plt.plot(self.get_input_data(), np_currents_list, color='r', label=text_string)
+        plt.plot(self.get_input_data()[10:-10], np_currents_list, color='r', label=text_string)
         handles = mlines.Line2D([], [], color='none', marker='none', linestyle='none')
         plt.legend(handles=[handles], labels=[text_string])
 

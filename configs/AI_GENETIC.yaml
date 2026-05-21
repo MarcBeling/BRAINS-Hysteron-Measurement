@@ -1,9 +1,9 @@
-name: "AI_GENETIC"
+name: "AI_GENETIC_LOG_LOSS_RES"
 description: "Using genetic algorithm to get a voltage configuration for RNPU hysteresis effect."
-device_measured: "RNPU"
+device_measured: "RNPU + 30 MOHm Resistor"
 min_value: -1.5
 max_value: 1.5
-data_density: 40
+data_density: 60
 voltage_range: [-1.55, 1.55]
 current_range: [-700e-9, 700e-9]
 amplification: 1
@@ -23,7 +23,7 @@ GA:
   mutation_type: "random"
   mutation_percent_genes: 25
   mutation_num_genes: 4
-  keep_parents: 2
+  keep_parents: 4
   parent_selection_type: "tournament"
   K_tournament: 5
 
@@ -53,4 +53,4 @@ K2400:
   pause_between_set: 0.00
   nplc_current: 0.01
   nplc_voltage: 1
-  average_over: 5
+  average_over: 1

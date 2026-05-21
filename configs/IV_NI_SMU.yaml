@@ -1,13 +1,13 @@
-name: "IV_RNPU_GA_TEST_PULSE"
-description: "Testing Device's Behaviour under Pulse signals"
+name: "IV_RNPU_GA_TEST_CLIFFHANGER"
+description: "Testing Device's Behaviour under Cliffhanger signals"
 device_measured: "RNPU"
 min_value: -1.5
 max_value: 1.5
-data_density: 20
+data_density: 120
 voltage_range: [-2, 2]
 current_range: [-400e-9, 400e-9]
 amplification: 1
-wavetype: 'PULSE'
+wavetype: 'CLIFFHANGER'
 input_pad: 7
 readout_pad: "IV"
 
