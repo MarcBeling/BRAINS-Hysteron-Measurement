@@ -42,9 +42,15 @@ class HardwareInterface(metaclass=Singleton):
         return fittness
     
     def compute_fittness(self, response: Response):
-        result = np.sum(np.abs(response.get_up_sweep() - np.flip(response.get_down_sweep())))
-        print(result)
-        return np.log(result)
+        difference = response.get_up_sweep() - np.flip(response.get_down_sweep())
+        index_middle_hysteresis = np.argmax(difference)
+        hysteresis_range = self.sm.get_config()["hysteresis_range"]
+        shortened_difference = difference[
+            max(0, index_middle_hysteresis-hysteresis_range)
+            :
+            min(len(difference), index_middle_hysteresis+hysteresis_range+1)
+            ].tolist()
+        return np.sum(shortened_difference)
 
     
     def get_fittness(self) -> List[float]:

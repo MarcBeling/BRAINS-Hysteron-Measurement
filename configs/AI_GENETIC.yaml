@@ -26,6 +26,7 @@ GA:
   keep_parents: 4
   parent_selection_type: "tournament"
   K_tournament: 5
+  hysteresis_range: 10
 
 nidaq:
   activation_module_id: 'cDAQ1Mod1'
